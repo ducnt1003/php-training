@@ -19,6 +19,7 @@ class PostSeeder extends Seeder
         Post::create([
             'title' => 'admin',
             'content' =>'sample@gmail.com',
+            'user_id' => '1',
         ]);
     }
 }

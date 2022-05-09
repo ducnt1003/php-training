@@ -17,7 +17,7 @@ class PostService
         $data = [
             'title' => $request->input('title'),
             'content' => $request->input('content'),
-            'url' => $request->input('url'),
+            'user_id' => $request->input('user_id'),
         ];
         if ($data['title'] == "hello")
         {
