@@ -14,10 +14,18 @@ Vue.use(VueRouter);
 import VueAxios from 'vue-axios';
 import axios from 'axios';
 
-import App from './App.vue';
+
 Vue.use(VueAxios, axios);
+import Vuesax from 'vuesax'
+import 'vuesax/dist/vuesax.css'
+Vue.use(Vuesax);
+
+import 'material-icons/iconfont/material-icons.css';
+
+import App from './App.vue';
 
 import ExampleComponent from './components/ExampleComponent.vue';
+import LoginComponent from './components/LoginComponent.vue';
 
 
 const routes = [
@@ -26,6 +34,11 @@ const routes = [
       path: '/',
       component: ExampleComponent
   },
+  {
+    name: 'login',
+    path: '/login',
+    component: LoginComponent
+},
 ];
 
 const router = new VueRouter({ mode: 'history', routes: routes});
