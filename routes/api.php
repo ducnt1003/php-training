@@ -3,6 +3,7 @@
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/posts/create',[PostController::class,'create']);
+
+Route::prefix('auth')->middleware('api')->group(function(){
+    Route::post('/login',[AuthController::class, 'login']);
+    Route::post('/logout',[AuthController::class, 'logout']);
+    Route::post('/refresh',[AuthController::class, 'refresh']);
+    Route::post('/me',[AuthController::class, 'me']);
+});
