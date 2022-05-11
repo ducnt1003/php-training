@@ -5439,7 +5439,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      user: {},
+      user: {
+        email: '',
+        password: ''
+      },
       checkMail: false,
       textMail: "",
       checkPass: false,
@@ -5484,16 +5487,20 @@ __webpack_require__.r(__webpack_exports__);
     checkForm: function checkForm() {
       var errors = 0;
 
-      if (this.user["email"] == null) {
+      if (this.user["email"] == '') {
         this.checkMail = true;
         this.textMail = "Email is required";
         errors++;
+      } else {
+        this.checkMail = false;
       }
 
-      if (this.user["password"] == null) {
+      if (this.user["password"] == '') {
         this.checkPass = true;
         this.textPass = "Password is required";
         errors++;
+      } else {
+        this.checkPass = false;
       }
 
       if (errors > 0) return false;
