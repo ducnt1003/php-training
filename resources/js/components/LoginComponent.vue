@@ -66,7 +66,7 @@
   </div>
 </template>
 <script>
-import { login } from "../config";
+import  api   from "../config";
 import { ValidationProvider } from "vee-validate";
 import { ValidationObserver } from "vee-validate";
 import { extend } from "vee-validate";
@@ -99,8 +99,7 @@ export default {
   },
   methods: {
     login() {
-      login
-        .post("", this.user)
+      this.axios.post(api['login'], this.user)
         .then((res) => {
           localStorage.setItem("usertoken", res.data.access_token);
           this.user = {};

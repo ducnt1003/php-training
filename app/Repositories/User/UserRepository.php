@@ -11,5 +11,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return \App\Models\User::class;
     }
 
+    public function getListWithRole(){
+        return \App\Models\User::class::with(['role'])->get();
+    }
 
 }

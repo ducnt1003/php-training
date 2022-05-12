@@ -24,23 +24,34 @@ import 'material-icons/iconfont/material-icons.css';
 
 import App from './App.vue';
 
+
 import ExampleComponent from './components/ExampleComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
+import UserComponent from './components/UserComponent.vue';
 
 
-const routes = [
-  {
-      name: 'example',
-      path: '/',
-      component: ExampleComponent
-  },
-  {
-    name: 'login',
-    path: '/login',
-    component: LoginComponent
-},
+const routes = [{
+        name: 'example',
+        path: '/',
+        component: ExampleComponent
+    },
+    {
+        name: 'login',
+        path: '/login',
+        component: LoginComponent
+    },
+    {
+        name: 'user',
+        path: '/user',
+        component: UserComponent
+    },
 ];
 
-const router = new VueRouter({ mode: 'history', routes: routes});
+const router = new VueRouter({
+    mode: 'history',
+    routes: routes
+});
 
-const app = new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+const app = new Vue(Vue.util.extend({
+    router
+}, App)).$mount('#app');

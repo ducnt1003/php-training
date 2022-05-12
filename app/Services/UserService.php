@@ -13,6 +13,6 @@ class UserService
     }
 
     public function getList(){
-        return $this->userRepository->getAll();
+        return $this->userRepository->getListWithRole();
     }
 }
