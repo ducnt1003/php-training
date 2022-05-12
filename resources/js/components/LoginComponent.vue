@@ -1,162 +1,135 @@
 <template>
   <div class="container">
-    <!-- <vs-row vs-align="center"
-  vs-type="flex" vs-justify="center" vs-w="12" >
-    <vs-col
-      type="flex"
-      vs-justify="center"
-      vs-align="center"
-      vs-lg="6"
-      vs-sm="6"
-      vs-xs="10"
+    <vs-popup
+      title="Login falled"
+      :active.sync="popupActivo"
     >
-    <vs-spacer></vs-spacer>
-      <vs-card fixedHeight>
-        <div slot="header">
-          <h3>Login</h3>
-        </div>
-        <form v-on:submit.prevent="login">
-          <div class="centerx">
-            <vs-row vs-justify="center">
-              <vs-input
-                size="large"
-                label-placeholder="Email"
-                v-model="user.email"
-              />
-            </vs-row>
-            <br />
-            <vs-row vs-justify="center">
-              <vs-input
-                size="large"
-                label-placeholder="Password"
-                v-model="user.password"
-                type="password"
-              />
-            </vs-row>
-          </div>
-          <br />
-          <div>
-            <vs-row vs-justify="center" vs-align="center">
-              <vs-button button="submit" size="large" type="gradient" color="primary"
-                >Login</vs-button
-              >
-            </vs-row>
-          </div>
-        </form>
-      </vs-card>
-    </vs-col>
-  </vs-row> -->
+      <p>
+       {{ popup_content }}
+      </p>
+    </vs-popup>
     <div class="row">
       <div class="col-md-6 mt-5 mx-auto">
-        <vs-card fixedHeight>
+        <vs-card actionable fixedHeight>
           <div slot="header">
             <h3>Login</h3>
           </div>
-          <form v-on:submit.prevent="login">
-            <div class="centerx">
-              <vs-row vs-justify="center">
-                <vs-input
-                  size="large"
-                  label-placeholder="Email"
-                  v-model="user.email"
-                  :danger="checkMail"
-                  :danger-text="textMail"
-                />
-              </vs-row>
+          <ValidationObserver v-slot="{ invalid }">
+            <form v-on:submit.prevent="login">
+              <div class="centerx">
+                <vs-row vs-justify="center">
+                  <ValidationProvider
+                    rules="email|required"
+                    v-slot="{ errors }"
+                  >
+                    <vs-input
+                      size="large"
+                      label-placeholder="Email"
+                      v-model="user.email"
+                      :danger="`${errors}` ? true : false"
+                      :danger-text="errors[0]"
+                    />
+                  </ValidationProvider>
+                </vs-row>
+                <br />
+                <vs-row vs-justify="center">
+                  <ValidationProvider rules="required" v-slot="{ errors }">
+                    <vs-input
+                      size="large"
+                      label-placeholder="Password"
+                      v-model="user.password"
+                      :danger="`${errors}` ? true : false"
+                      :danger-text="`${errors[0]}`"
+                      type="password"
+                    />
+                  </ValidationProvider>
+                </vs-row>
+              </div>
               <br />
-              <vs-row vs-justify="center">
-                <vs-input
-                  size="large"
-                  label-placeholder="Password"
-                  v-model="user.password"
-                  :danger="checkPass"
-                  :danger-text="textPass"
-                  type="password"
-                />
-              </vs-row>
-            </div>
-            <br />
-            <div>
-              <vs-row vs-justify="center" vs-align="center">
-                <vs-button
-                  button="submit"
-                  size="large"
-                  type="gradient"
-                  color="primary"
-                  >Login</vs-button
-                >
-              </vs-row>
-            </div>
-          </form>
+              <div>
+                <vs-row vs-justify="center" vs-align="center">
+                  <vs-button
+                    button="submit"
+                    size="large"
+                    type="gradient"
+                    color="primary"
+                    :disabled="invalid"
+                    >Login</vs-button
+                  >
+                </vs-row>
+              </div>
+            </form>
+          </ValidationObserver>
         </vs-card>
       </div>
     </div>
   </div>
 </template>
 <script>
+import { login } from "../config";
+import { ValidationProvider } from "vee-validate";
+import { ValidationObserver } from "vee-validate";
+import { extend } from "vee-validate";
+import { required, email, min } from "vee-validate/dist/rules";
+
+extend("required", {
+  ...required,
+  message: "This field is required",
+});
+extend("email", {
+  ...email,
+  message: "Invalid email address!",
+});
+
 export default {
   data() {
     return {
       user: {
-          email:'',
-          password:''
+        email: "",
+        password: "",
       },
       checkMail: false,
       textMail: "",
       checkPass: false,
       textPass: "",
+      errors: [],
+      popupActivo: false,
+      popup_content: 'Please re-enter your email and password',
     };
   },
   methods: {
     login() {
-      let uri = "http://127.0.0.1:8000/api/auth/login";
-      if (this.checkForm()) {
-        this.axios
-          .post(uri, this.user)
-          .then((res) => {
-            localStorage.setItem("usertoken", res.data.access_token);
-            this.user = {};
-            this.$router.push({ name: "example" });
-          })
-          .catch((err) => {
-              console.log(err.response);
-            if (err.response.status == 422) {
-              if (err.response.data.errors.email != null) {
-                this.checkMail = true;
-                this.textMail = err.response.data.errors.email[0];
-              }else{
-                  this.checkMail = false;
-              }
-              if (err.response.data.errors.password != null) {
-                this.checkPass = true;
-              }else{
-                  this.checkPass = false;
-                  this.textPass = err.response.data.errors.password[0];
-              }
+      login
+        .post("", this.user)
+        .then((res) => {
+          localStorage.setItem("usertoken", res.data.access_token);
+          this.user = {};
+          this.$router.push({ name: "example" });
+        })
+        .catch((err) => {
+          if (err.response.status == 422) {
+            if (err.response.data.errors.email != null) {
+              this.checkMail = true;
+              this.textMail = err.response.data.errors.email[0];
+            } else {
+              this.checkMail = false;
             }
-
-          });
-      }
+            if (err.response.data.errors.password != null) {
+              this.checkPass = true;
+            } else {
+              this.checkPass = false;
+              this.textPass = err.response.data.errors.password[0];
+            }
+          }
+          if (err.response.status == 401) {
+            this.popupActivo = true;
+          }
+        });
     },
-    checkForm() {
-      let errors = 0;
-      if (this.user["email"] == '') {
-        this.checkMail = true;
-        this.textMail = "Email is required";
-        errors++;
-      }else{
-          this.checkMail = false;
-      }
-      if (this.user["password"] == '') {
-        this.checkPass = true;
-        this.textPass = "Password is required";
-        errors++;
-      }else{
-          this.checkPass = false;
-      }
-      if (errors > 0) return false;
-      return true;
-    },
+  },
+  components: {
+    ValidationProvider,
+    ValidationObserver,
   },
 };
 </script>
