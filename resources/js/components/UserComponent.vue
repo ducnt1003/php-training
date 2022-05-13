@@ -1,6 +1,44 @@
 <template>
   <div>
-    <vs-table pagination max-items="10" search :data="users">
+    <vs-table>
+      <template #header>
+        <vs-input v-model="search" border placeholder="Search" />
+      </template>
+      <template #thead>
+        <vs-tr>
+          <vs-th sort @click="users = $vs.sortData($event, users, 'name')">
+            Name
+          </vs-th>
+          <vs-th sort @click="users = $vs.sortData($event, users, 'email')">
+            Email
+          </vs-th>
+          <vs-th sort @click="users = $vs.sortData($event, users, 'id')">
+            Id
+          </vs-th>
+        </vs-tr>
+      </template>
+      <template #tbody>
+        <vs-tr
+          :key="i"
+          v-for="(tr, i) in $vs.getPage(users, page, max)"
+          :data="tr"
+        >
+          <vs-td>
+            {{ tr.name }}
+          </vs-td>
+          <vs-td>
+            {{ tr.email }}
+          </vs-td>
+          <vs-td>
+            {{ tr.id }}
+          </vs-td>
+        </vs-tr>
+      </template>
+      <template #footer>
+        <vs-pagination v-model="page" :length="$vs.getLength(users, max)" />
+      </template>
+    </vs-table>
+    <!-- <vs-table pagination max-items="10" search :data="users">
       <template slot="header">
         <h3>Users</h3>
       </template>
@@ -28,7 +66,7 @@
           </vs-td>
         </vs-tr>
       </template>
-    </vs-table>
+    </vs-table> -->
   </div>
 </template>
 <script>
@@ -36,6 +74,9 @@ import api from "../config";
 export default {
   data() {
     return {
+      page: 1,
+      max: 10,
+      search: "",
       users: [],
     };
   },

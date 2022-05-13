@@ -1,72 +1,158 @@
 <template>
-  <div class="container">
-    <vs-popup
-      title="Login falled"
-      :active.sync="popupActivo"
-    >
-      <p>
-       {{ popup_content }}
-      </p>
-    </vs-popup>
-    <div class="row">
-      <div class="col-md-6 mt-5 mx-auto">
-        <vs-card actionable fixedHeight>
-          <div slot="header">
-            <h3>Login</h3>
+  <div id="login">
+    <vs-dialog width="550px" not-center v-model="active">
+        <template #header>
+          <h4 class="not-margin">
+            Login Failed
+          </h4>
+        </template>
+        <div class="con-content">
+          <p>
+           Plese re-enter your email and password
+          </p>
+        </div>
+
+      </vs-dialog>
+    <div class="row justify-content-center no-gutters">
+      <div class="d-flex align-items-center col-lg-12">
+        <div class="card w-100">
+          <div class="row no-gutters" style="min-height: 100vh">
+            <div
+              class="bg-primary d-md-flex align-items-center justify-content-center col-lg-6"
+            >
+              <vs-row align="center" justify="center">
+                <vs-col w="8"
+                  ><h2 class="text-white">
+                    Elegant Design with unlimited features, built with love
+                  </h2>
+                  <p class="mt-4 text-white op-5 font-weight-normal">
+                    Wrappixel helps developers to build organized and well-coded
+                    admin dashboards full of beautiful and feature rich modules.
+                  </p>
+
+                  <vs-button color="#35b1e8"  primary>
+                    <h5 class="mt-1">Learn more</h5>
+                  </vs-button>
+                </vs-col>
+              </vs-row>
+            </div>
+            <div
+              class="d-md-flex align-items-center justify-content-center col-lg-6"
+            >
+              <div class="d-flex align-items-center w-100">
+                <div class="p-5 w-100">
+                  <div class="row justify-content-center">
+                    <div class="col-lg-9 col-xl-6 col-12">
+                      <img src="/img/icon.png" alt="" />
+                      <h2 class="mt-4 font-weight-bold">Signin</h2>
+                      <h6 class="mb-4">
+                        Dont have an acount? <a href=""> Signup</a>
+                      </h6>
+                      <ValidationObserver ref="form" v-slot="{ handleSubmit }">
+                        <form @submit.prevent="handleSubmit(login)">
+                          <div class="mb-3">
+                            <ValidationProvider
+                              vid="email"
+                              name="E-mail"
+                              rules="required"
+                              v-slot="{ errors }"
+                            >
+                              <vs-input
+                                state="dark"
+                                v-model="user.email"
+                                placeholder="Email"
+                              >
+                                <template #icon>
+                                  <box-icon name="user"></box-icon>
+                                </template>
+                                <template v-if="errors" #message-danger>
+                                  {{ errors[0] }}
+                                </template>
+                              </vs-input>
+                            </ValidationProvider>
+                          </div>
+                          <div class="mb-3">
+                            <ValidationProvider
+                              vid="password"
+                              name="Password"
+                              rules="required"
+                              v-slot="{ errors }"
+                            >
+                              <vs-input
+                                state="dark"
+                                v-model="user.password"
+                                placeholder="password"
+                                type="password"
+                              >
+                                <template #icon>
+                                  <box-icon name="lock-alt"></box-icon>
+                                </template>
+                                <template v-if="errors" #message-danger>
+                                  {{ errors[0] }}
+                                </template>
+                              </vs-input>
+                            </ValidationProvider>
+                          </div>
+                          <vs-row>
+                            <vs-col w="6">
+                              <vs-checkbox v-model="option1"
+                                >I accept the terms and use</vs-checkbox
+                              ></vs-col
+                            >
+                            <vs-col offset="2" w="4">
+                              <vs-row justify="flex-end">
+                                <router-link to=""
+                                  >Forgot pwd?</router-link
+                                ></vs-row
+                              >
+                            </vs-col>
+                          </vs-row>
+                          <vs-row>
+                            <vs-col w="12">
+                              <vs-button style="width: 100%" primary>
+                                  <h5 class="mt-1">Sign In</h5>
+
+
+                              </vs-button>
+                            </vs-col>
+                          </vs-row>
+                        </form>
+                      </ValidationObserver>
+                      <vs-row>
+                        <vs-col offset="3" w="3">
+                          <vs-button style="width: 90%" color="rgb(29,161,242)">
+                            <box-icon
+                              name="twitter"
+                              type="logo"
+                              color="#f3e5e5"
+                            ></box-icon>
+                            Twitter
+                          </vs-button>
+                        </vs-col>
+                        <vs-col w="3">
+                          <vs-button style="width: 90%" dark>
+                            <box-icon
+                              name="github"
+                              type="logo"
+                              color="#f3e5e5"
+                            ></box-icon>
+                            Github
+                          </vs-button>
+                        </vs-col>
+                      </vs-row>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <ValidationObserver v-slot="{ invalid }">
-            <form v-on:submit.prevent="login">
-              <div class="centerx">
-                <vs-row vs-justify="center">
-                  <ValidationProvider
-                    rules="email|required"
-                    v-slot="{ errors }"
-                  >
-                    <vs-input
-                      size="large"
-                      label-placeholder="Email"
-                      v-model="user.email"
-                      :danger="`${errors}` ? true : false"
-                      :danger-text="errors[0]"
-                    />
-                  </ValidationProvider>
-                </vs-row>
-                <br />
-                <vs-row vs-justify="center">
-                  <ValidationProvider rules="required" v-slot="{ errors }">
-                    <vs-input
-                      size="large"
-                      label-placeholder="Password"
-                      v-model="user.password"
-                      :danger="`${errors}` ? true : false"
-                      :danger-text="`${errors[0]}`"
-                      type="password"
-                    />
-                  </ValidationProvider>
-                </vs-row>
-              </div>
-              <br />
-              <div>
-                <vs-row vs-justify="center" vs-align="center">
-                  <vs-button
-                    button="submit"
-                    size="large"
-                    type="gradient"
-                    color="primary"
-                    :disabled="invalid"
-                    >Login</vs-button
-                  >
-                </vs-row>
-              </div>
-            </form>
-          </ValidationObserver>
-        </vs-card>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import  api   from "../config";
+import api from "../config";
 import { ValidationProvider } from "vee-validate";
 import { ValidationObserver } from "vee-validate";
 import { extend } from "vee-validate";
@@ -88,18 +174,16 @@ export default {
         email: "",
         password: "",
       },
-      checkMail: false,
-      textMail: "",
-      checkPass: false,
-      textPass: "",
-      errors: [],
+      active: false,
+      option1: "",
       popupActivo: false,
-      popup_content: 'Please re-enter your email and password',
+      popup_content: "Please re-enter your email and password",
     };
   },
   methods: {
     login() {
-      this.axios.post(api['login'], this.user)
+      this.axios
+        .post(api["login"], this.user)
         .then((res) => {
           localStorage.setItem("usertoken", res.data.access_token);
           this.user = {};
@@ -107,21 +191,10 @@ export default {
         })
         .catch((err) => {
           if (err.response.status == 422) {
-            if (err.response.data.errors.email != null) {
-              this.checkMail = true;
-              this.textMail = err.response.data.errors.email[0];
-            } else {
-              this.checkMail = false;
-            }
-            if (err.response.data.errors.password != null) {
-              this.checkPass = true;
-            } else {
-              this.checkPass = false;
-              this.textPass = err.response.data.errors.password[0];
-            }
+            this.$refs.form.setErrors(err.response.data.errors);
           }
           if (err.response.status == 401) {
-            this.popupActivo = true;
+            this.active = true;
           }
         });
     },
@@ -133,14 +206,12 @@ export default {
 };
 </script>
 <style>
-body {
+#login {
   min-height: 100vh;
-  background-image: radial-gradient(
-    circle 621px at 25.3% 13.8%,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(234, 236, 255, 1) 90%
-  );
   font-family: "Roboto", sans-serif;
+}
+.vs-input {
+  width: 100%;
 }
 </style>
 

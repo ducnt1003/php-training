@@ -21,6 +21,7 @@ import 'vuesax/dist/vuesax.css'
 Vue.use(Vuesax);
 
 import 'material-icons/iconfont/material-icons.css';
+import 'boxicons'
 
 import App from './App.vue';
 
