@@ -29,6 +29,9 @@ import App from './App.vue';
 import ExampleComponent from './components/ExampleComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import UserComponent from './components/UserComponent.vue';
+import Error404Component from './components/errors/404Component.vue';
+import Error403Component from './components/errors/403Component.vue';
+import Error500Component from './components/errors/500Component.vue';
 
 
 const routes = [{
@@ -42,9 +45,27 @@ const routes = [{
         component: LoginComponent
     },
     {
-        name: 'user',
-        path: '/user',
+        name: 'users',
+        path: '/users',
         component: UserComponent
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: '/errors404',
+        component: Error404Component
+    },
+
+    {
+        name: 'errors403',
+        path: '/errors403',
+        component: Error403Component,
+
+    },
+    {
+        name: 'errors500',
+        path: '/errors500',
+        component: Error500Component,
+
     },
 ];
 

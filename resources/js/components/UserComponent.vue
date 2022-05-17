@@ -70,7 +70,7 @@
   </div>
 </template>
 <script>
-import api from "../config";
+import { user } from "../config";
 export default {
   data() {
     return {
@@ -81,12 +81,8 @@ export default {
     };
   },
   mounted() {
-    this.axios
-      .get(api["user"], {
-        headers: {
-          Authorization: `Bearer ${localStorage.usertoken}`,
-        },
-      })
+    user
+      .get("")
       .then((res) => {
         this.users = res.data;
         console.log(this.users);
