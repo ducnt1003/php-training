@@ -27,9 +27,11 @@
         "autoprefixer": "10.4.5",
         "boxicons": "^2.1.2",
         "material-icons": "^1.10.11",
+        "mix-env-file": "^0.1.1",
         "vee-validate": "^3.4.14",
         "vue-axios": "^3.4.1",
         "vue-router": "^3.5.3",
-        "vuesax": "^4.0.1-alpha.25"
+        "vuesax": "^4.0.1-alpha.25",
+        "vuex": "^3.6.2"
     }
 }

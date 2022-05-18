@@ -1,92 +1,168 @@
 <template>
   <div>
-    <vs-table>
+    <vs-row>
+      <vs-table>
+        <template #thead>
+          <vs-tr>
+            <vs-th> Id </vs-th>
+            <vs-th> Email </vs-th>
+            <vs-th> Name </vs-th>
+            <vs-th
+              ><vs-row justify="flex-end"
+                ><vs-button success @click="activeCreate = !activeCreate"
+                  >Create</vs-button
+                ></vs-row
+              >
+            </vs-th>
+          </vs-tr>
+        </template>
+        <template #tbody>
+          <vs-tr
+            :key="i"
+            v-for="(tr, i) in $vs.getPage(users, page, max)"
+            :data="tr"
+          >
+            <vs-td>
+              {{ tr.id }}
+            </vs-td>
+            <vs-td>
+              {{ tr.email }}
+            </vs-td>
+            <vs-td>
+              {{ tr.name }}
+            </vs-td>
+            <vs-td>
+              <vs-row justify="flex-end">
+                <vs-button> Edit </vs-button>
+                <vs-button color="rgb(242, 19, 93)"> Delete </vs-button></vs-row
+              >
+            </vs-td>
+          </vs-tr>
+        </template>
+        <template #footer>
+          <vs-pagination v-model="page" :length="$vs.getLength(users, max)" />
+        </template>
+      </vs-table>
+    </vs-row>
+    <vs-dialog width="550px" not-center v-model="activeCreate">
       <template #header>
-        <vs-input v-model="search" border placeholder="Search" />
+        <h4 class="not-margin">Create new User</h4>
       </template>
-      <template #thead>
-        <vs-tr>
-          <vs-th sort @click="users = $vs.sortData($event, users, 'name')">
-            Name
-          </vs-th>
-          <vs-th sort @click="users = $vs.sortData($event, users, 'email')">
-            Email
-          </vs-th>
-          <vs-th sort @click="users = $vs.sortData($event, users, 'id')">
-            Id
-          </vs-th>
-        </vs-tr>
-      </template>
-      <template #tbody>
-        <vs-tr
-          :key="i"
-          v-for="(tr, i) in $vs.getPage(users, page, max)"
-          :data="tr"
-        >
-          <vs-td>
-            {{ tr.name }}
-          </vs-td>
-          <vs-td>
-            {{ tr.email }}
-          </vs-td>
-          <vs-td>
-            {{ tr.id }}
-          </vs-td>
-        </vs-tr>
-      </template>
+
+      <div>
+        <vs-row class="mt-5">
+          <vs-col
+            vs-type="flex"
+            vs-justify="center"
+            vs-align="center"
+            w="10"
+            offset="1"
+          >
+            <vs-input
+              label="Name"
+              state="dark"
+              v-model="user.name"
+              placeholder="Name"
+            ></vs-input>
+          </vs-col>
+        </vs-row>
+        <vs-row class="mt-5">
+          <vs-col
+            vs-type="flex"
+            vs-justify="center"
+            vs-align="center"
+            w="10"
+            offset="1"
+          >
+            <vs-input
+              label="Email"
+              state="dark"
+              v-model="user.email"
+              placeholder="Email"
+            ></vs-input>
+          </vs-col>
+        </vs-row>
+        <vs-row class="mt-5">
+          <vs-col
+            vs-type="flex"
+            vs-justify="center"
+            vs-align="center"
+            w="10"
+            offset="1"
+          >
+            <vs-select
+            label="Role"
+              color= success
+              v-model="user.role_id"
+            >
+              <vs-option label="SuperAdmin" value="1"> SuperAdmin </vs-option>
+              <vs-option label="Admin" value="2"> Admin </vs-option>
+              <vs-option label="User" value="3"> User </vs-option>
+            </vs-select>
+          </vs-col>
+        </vs-row>
+      </div>
+
       <template #footer>
-        <vs-pagination v-model="page" :length="$vs.getLength(users, max)" />
+        <div class="con-footer">
+          <vs-row justify="flex-end">
+            <vs-button @click="create" transparent>
+              Ok
+            </vs-button>
+            <vs-button @click="activeCreate = false" dark transparent>
+              Cancel
+            </vs-button></vs-row
+          >
+        </div>
       </template>
-    </vs-table>
-    <!-- <vs-table pagination max-items="10" search :data="users">
-      <template slot="header">
-        <h3>Users</h3>
-      </template>
-      <template slot="thead">
-        <vs-th sort-key="id"> Nro </vs-th>
-        <vs-th sort-key="email"> Email </vs-th>
-        <vs-th sort-key="name"> Name </vs-th>
-        <vs-th sort-key="role_id"> Role </vs-th>
-      </template>
-
-      <template slot-scope="{ data }">
-        <vs-tr :key="indextr" v-for="(tr, indextr) in data">
-          <vs-td :data="data[indextr].id">
-            {{ data[indextr].id }}
-          </vs-td>
-          <vs-td :data="data[indextr].email">
-            {{ data[indextr].email }}
-          </vs-td>
-
-          <vs-td :data="data[indextr].name">
-            {{ data[indextr].name }}
-          </vs-td>
-          <vs-td :data="data[indextr].role['role']">
-            {{ data[indextr].role['role'] }}
-          </vs-td>
-        </vs-tr>
-      </template>
-    </vs-table> -->
+    </vs-dialog>
   </div>
 </template>
 <script>
-import { user } from "../config";
+import { ValidationProvider } from "vee-validate";
+import { getUser } from "../config/config.api";
+import { mapActions, mapGetters, mapState } from "vuex";
 export default {
   data() {
     return {
+      user: {
+          name:'',
+          email:'',
+          role_id:0,
+      },
       page: 1,
       max: 10,
       search: "",
-      users: [],
+      activeCreate: false,
     };
   },
+  computed: {
+    users() {
+      //console.log(this.users);
+      return this.$store.getters.users;
+    },
+  },
+  methods:{
+      //...mapActions(['createUser']);
+      create(){
+          this.$store.dispatch("createUser",this.user);
+          this.activeCreate = false;
+      }
+
+  },
+
+  created() {},
   mounted() {
-    user
-      .get("")
-      .then((res) => {
-        this.users = res.data;
-        console.log(this.users);
-      });
+    console.log(this.users);
+    this.$store.dispatch("setUsers");
+  },
+  components: {
+    ValidationProvider,
   },
 };
 </script>
+<style scoped>
+.vs-input {
+  width: 80%;
+}
+</style>

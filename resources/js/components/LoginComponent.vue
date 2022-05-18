@@ -152,11 +152,13 @@
   </div>
 </template>
 <script>
-import { login } from "../config";
+// import { login } from "../config";
 import { ValidationProvider } from "vee-validate";
 import { ValidationObserver } from "vee-validate";
 import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
+import { login } from "../config/config.api";
+import { httpClient,SET_AUTH_TOKEN } from "../config/httpClient"
 
 extend("required", {
   ...required,
@@ -182,14 +184,14 @@ export default {
   },
   methods: {
     login() {
-      login
-        .post('', this.user)
+      login(this.user)
         .then((res) => {
           localStorage.setItem("usertoken", res.data.access_token);
           this.user = {};
-          this.$router.push({ name: "example" });
+          this.$router.push({ name: "users" });
         })
         .catch((err) => {
+            console.log(err)
           if (err.response.status == 422) {
             this.$refs.form.setErrors(err.response.data.errors);
           }

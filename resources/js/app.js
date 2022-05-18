@@ -24,6 +24,7 @@ import 'material-icons/iconfont/material-icons.css';
 import 'boxicons'
 
 import App from './App.vue';
+import store from './store/store';
 
 
 import ExampleComponent from './components/ExampleComponent.vue';
@@ -75,5 +76,5 @@ const router = new VueRouter({
 });
 
 const app = new Vue(Vue.util.extend({
-    router
+    router,store
 }, App)).$mount('#app');

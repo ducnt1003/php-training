@@ -14,6 +14,5 @@
         <div id="app">
         </div>
         <script src="{{ mix('js/app.js') }}" type="text/javascript"></script>
-        <script src="https://unpkg.com/boxicons@2.1.2/dist/boxicons.js"></script>
     </body>
 </html>
