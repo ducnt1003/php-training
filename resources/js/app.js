@@ -26,15 +26,14 @@ import 'boxicons'
 import App from './App.vue';
 import store from './store/store';
 
-
 import ExampleComponent from './components/ExampleComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import UserComponent from './components/UserComponent.vue';
 import Error404Component from './components/errors/404Component.vue';
 import Error403Component from './components/errors/403Component.vue';
 import Error500Component from './components/errors/500Component.vue';
-
-
+import { httpClient } from './config/httpClient';
+Vue.prototype.$httpClient = httpClient;
 const routes = [{
         name: 'example',
         path: '/',

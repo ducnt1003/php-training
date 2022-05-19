@@ -157,7 +157,7 @@ import { ValidationProvider } from "vee-validate";
 import { ValidationObserver } from "vee-validate";
 import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
-import { login } from "../config/config.api";
+import { login, } from "../config/config.api";
 import { httpClient,SET_AUTH_TOKEN } from "../config/httpClient"
 
 extend("required", {
@@ -186,6 +186,7 @@ export default {
     login() {
       login(this.user)
         .then((res) => {
+           SET_AUTH_TOKEN(res.data.access_token);
           localStorage.setItem("usertoken", res.data.access_token);
           this.user = {};
           this.$router.push({ name: "users" });

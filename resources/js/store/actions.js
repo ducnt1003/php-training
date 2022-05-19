@@ -1,4 +1,4 @@
-import { getUser,createUser } from "../config/config.api";
+import { getUser,createUser,editUser } from "../config/config.api";
 
 export default  {
     setUsers({commit}) {
@@ -14,4 +14,16 @@ export default  {
             commit('createUser', res.data)
         });
     },
+    editUser({commit},id){
+        commit('selectUser',id);
+        commit('setActiveEdit');
+    },
+    updateUser({commit},user){
+        editUser(user.id,user).then((res)=>{
+            console.log(res.data)
+            commit('updateUser', res.data);
+            commit('setActiveEdit');
+        });
+
+    }
 }

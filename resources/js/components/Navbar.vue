@@ -1,25 +1,24 @@
 <template>
-  <vs-navbar
-    v-model="activeItem"
-    class="nabarx"
-    text-color="rgba(7,8,8,.6)"
-    active-text-color="rgba(7,8,8,1)"
+  <vs-row class="navbar bg-primary round" justify="flex-end"
+    ><vs-button dark @click="logout">Log Out</vs-button></vs-row
   >
-    <vs-navbar-item index="1">
-      <router-link to="/">Home</router-link>
-    </vs-navbar-item>
-    <vs-navbar-item index="2">
-      <router-link to="/login">Login</router-link>
-    </vs-navbar-item>
-    <vs-navbar-item index="3">
-      <router-link to="/logout">Logout</router-link>
-    </vs-navbar-item>
-  </vs-navbar>
 </template>
 <script>
+import { logout } from "../config/config.api";
 export default {
-  data: () => ({
-    activeItem: 0,
-  }),
+  data: () => ({}),
+  methods: {
+    logout() {
+      logout()
+        .then((res) => {
+          console.log(res);
+          this.$router.push({name:'login'});
+          localStorage.removeItem("usertoken");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
 };
 </script>

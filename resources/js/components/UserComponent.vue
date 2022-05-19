@@ -1,5 +1,6 @@
 <template>
   <div>
+    <navbar/>
     <vs-row>
       <vs-table>
         <template #thead>
@@ -33,7 +34,7 @@
             </vs-td>
             <vs-td>
               <vs-row justify="flex-end">
-                <vs-button> Edit </vs-button>
+                <vs-button @click="edit(tr.id)"> Edit </vs-button>
                 <vs-button color="rgb(242, 19, 93)"> Delete </vs-button></vs-row
               >
             </vs-td>
@@ -90,11 +91,7 @@
             w="10"
             offset="1"
           >
-            <vs-select
-            label="Role"
-              color= success
-              v-model="user.role_id"
-            >
+            <vs-select label="Role" color="success" v-model="user.role_id">
               <vs-option label="SuperAdmin" value="1"> SuperAdmin </vs-option>
               <vs-option label="Admin" value="2"> Admin </vs-option>
               <vs-option label="User" value="3"> User </vs-option>
@@ -106,9 +103,7 @@
       <template #footer>
         <div class="con-footer">
           <vs-row justify="flex-end">
-            <vs-button @click="create" transparent>
-              Ok
-            </vs-button>
+            <vs-button @click="create" transparent> Ok </vs-button>
             <vs-button @click="activeCreate = false" dark transparent>
               Cancel
             </vs-button></vs-row
@@ -116,19 +111,21 @@
         </div>
       </template>
     </vs-dialog>
+    <EditComponent/>
   </div>
 </template>
 <script>
 import { ValidationProvider } from "vee-validate";
-import { getUser } from "../config/config.api";
-import { mapActions, mapGetters, mapState } from "vuex";
+import Navbar from "../components/Navbar.vue";
+import EditComponent from "../components/User/EditComponent.vue";
+import { mapActions, mapGetters, mapState,mapMutations } from "vuex";
 export default {
   data() {
     return {
       user: {
-          name:'',
-          email:'',
-          role_id:0,
+        name: "",
+        email: "",
+        role_id: 0,
       },
       page: 1,
       max: 10,
@@ -141,13 +138,19 @@ export default {
       //console.log(this.users);
       return this.$store.getters.users;
     },
+    ...mapGetters(['activeEdit'])
   },
-  methods:{
-      //...mapActions(['createUser']);
-      create(){
-          this.$store.dispatch("createUser",this.user);
-          this.activeCreate = false;
-      }
+  methods: {
+    //...mapActions(['createUser']);
+    create() {
+      this.$store.dispatch("createUser", this.user);
+      this.activeCreate = false;
+    },
+    ...mapMutations(['setActiveEdit']),
+    edit(id){
+        this.$store.dispatch('editUser',id);
+    }
+
 
   },
 
@@ -158,10 +161,15 @@ export default {
   },
   components: {
     ValidationProvider,
+    Navbar: Navbar,
+    EditComponent,
   },
 };
 </script>
 <style scoped>
+.nav {
+  height: 20;
+}
 .vs-input {
   width: 80%;
 }

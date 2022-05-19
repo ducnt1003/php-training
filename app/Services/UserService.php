@@ -26,4 +26,13 @@ class UserService
         ];
         return $this->userRepository->create($data);
     }
+
+    public function edit($id,Request $request){
+        $data = [
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'role_id' => $request->input('role_id'),
+        ];
+        return $this->userRepository->update($id,$data);
+    }
 }
