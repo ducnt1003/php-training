@@ -1,18 +1,13 @@
 <template>
   <div id="login">
     <vs-dialog width="550px" not-center v-model="active">
-        <template #header>
-          <h4 class="not-margin">
-            Login Failed
-          </h4>
-        </template>
-        <div class="con-content">
-          <p>
-           Plese re-enter your email and password
-          </p>
-        </div>
-
-      </vs-dialog>
+      <template #header>
+        <h4 class="not-margin">Login Failed</h4>
+      </template>
+      <div class="con-content">
+        <p>Plese re-enter your email and password</p>
+      </div>
+    </vs-dialog>
     <div class="row justify-content-center no-gutters">
       <div class="d-flex align-items-center col-lg-12">
         <div class="card w-100">
@@ -30,7 +25,7 @@
                     admin dashboards full of beautiful and feature rich modules.
                   </p>
 
-                  <vs-button color="#35b1e8"  primary>
+                  <vs-button color="#35b1e8" primary>
                     <h5 class="mt-1">Learn more</h5>
                   </vs-button>
                 </vs-col>
@@ -110,9 +105,7 @@
                           <vs-row>
                             <vs-col w="12">
                               <vs-button style="width: 100%" primary>
-                                  <h5 class="mt-1">Sign In</h5>
-
-
+                                <h5 class="mt-1">Sign In</h5>
                               </vs-button>
                             </vs-col>
                           </vs-row>
@@ -157,8 +150,8 @@ import { ValidationProvider } from "vee-validate";
 import { ValidationObserver } from "vee-validate";
 import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
-import { login, } from "../config/config.api";
-import { httpClient,SET_AUTH_TOKEN } from "../config/httpClient"
+import { login } from "../config/config.api";
+import { httpClient, injectToken, SET_AUTH_TOKEN } from "../config/httpClient";
 
 extend("required", {
   ...required,
@@ -186,13 +179,18 @@ export default {
     login() {
       login(this.user)
         .then((res) => {
-           SET_AUTH_TOKEN(res.data.access_token);
+          SET_AUTH_TOKEN(res.data.access_token);
           localStorage.setItem("usertoken", res.data.access_token);
+          this.$store.dispatch("login", res.data.user);
           this.user = {};
-          this.$router.push({ name: "users" });
+            console.log(localStorage.getItem("redirectPath"));
+          this.$router.replace(
+            localStorage.redirectPath || "/users"
+          );
+          localStorage.removeItem("redirectPath");
         })
         .catch((err) => {
-            console.log(err)
+          console.log(err);
           if (err.response.status == 422) {
             this.$refs.form.setErrors(err.response.data.errors);
           }

@@ -9,7 +9,8 @@ const logout = () =>httpClient.post('auth/logout');
 const getUser = () => httpClient.get('/users');
 const createUser = (user) => httpClient.post('/users/create',user);
 const editUser = (id,user) => httpClient.post(`/users/edit/${id}`,user);
+const deleteUser = (id,user) => httpClient.delete(`/users/delete/${id}`);
 
 export {
-    login, getUser,createUser,logout,editUser
+    login, getUser,createUser,logout,editUser,deleteUser
 }

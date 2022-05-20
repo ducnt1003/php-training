@@ -27,4 +27,8 @@ class UserController extends Controller
     public function edit($id,Request $request){
         return $this->userService->edit($id,$request);
     }
+
+    public function delete($id){
+        return $this->userService->delete($id);
+    }
 }

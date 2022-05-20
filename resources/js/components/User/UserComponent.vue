@@ -1,13 +1,25 @@
 <template>
   <div>
-    <navbar/>
+    <navbar />
     <vs-row>
       <vs-table>
+        <template #header>
+          <vs-input v-model="search" border placeholder="Search" />
+        </template>
         <template #thead>
-          <vs-tr>
-            <vs-th> Id </vs-th>
-            <vs-th> Email </vs-th>
-            <vs-th> Name </vs-th>
+          <vs-tr >
+            <vs-th sort @click="users = $vs.sortData($event, users, 'id')">
+              Id
+            </vs-th>
+            <vs-th sort @click="users = $vs.sortData($event, users, 'email')">
+              Email
+            </vs-th>
+            <vs-th sort @click="users = $vs.sortData($event, users, 'name')">
+              Name
+            </vs-th>
+            <vs-th sort @click="users = $vs.sortData($event, users, 'role')">
+              Role
+            </vs-th>
             <vs-th
               ><vs-row justify="flex-end"
                 ><vs-button success @click="activeCreate = !activeCreate"
@@ -33,9 +45,17 @@
               {{ tr.name }}
             </vs-td>
             <vs-td>
+              {{ tr.role }}
+            </vs-td>
+            <vs-td>
               <vs-row justify="flex-end">
                 <vs-button @click="edit(tr.id)"> Edit </vs-button>
-                <vs-button color="rgb(242, 19, 93)"> Delete </vs-button></vs-row
+                <vs-button
+                  @click="(id = tr.id), (name = tr.name), (activeDelete = true)"
+                  color="rgb(242, 19, 93)"
+                >
+                  Delete
+                </vs-button></vs-row
               >
             </vs-td>
           </vs-tr>
@@ -49,7 +69,6 @@
       <template #header>
         <h4 class="not-margin">Create new User</h4>
       </template>
-
       <div>
         <vs-row class="mt-5">
           <vs-col
@@ -99,7 +118,6 @@
           </vs-col>
         </vs-row>
       </div>
-
       <template #footer>
         <div class="con-footer">
           <vs-row justify="flex-end">
@@ -111,14 +129,31 @@
         </div>
       </template>
     </vs-dialog>
-    <EditComponent/>
+    <EditComponent />
+    <vs-dialog width="550px" not-center v-model="activeDelete">
+      <template #header>
+        <h4 class="not-margin">Delete User</h4>
+      </template>
+      <p>Are you sure to delete user {{ name }} (id:{{ id }})</p>
+
+      <template #footer>
+        <div class="con-footer">
+          <vs-row justify="flex-end">
+            <vs-button @click="deleteUser" transparent> Ok </vs-button>
+            <vs-button @click="activeDelete = false" dark transparent>
+              Cancel
+            </vs-button></vs-row
+          >
+        </div>
+      </template>
+    </vs-dialog>
   </div>
 </template>
 <script>
 import { ValidationProvider } from "vee-validate";
-import Navbar from "../components/Navbar.vue";
-import EditComponent from "../components/User/EditComponent.vue";
-import { mapActions, mapGetters, mapState,mapMutations } from "vuex";
+import Navbar from "../Navbar.vue";
+import EditComponent from "./EditComponent.vue";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -131,33 +166,54 @@ export default {
       max: 10,
       search: "",
       activeCreate: false,
+      activeDelete: false,
+      id: "",
+      name: "",
     };
   },
-  computed: {
-    users() {
-      //console.log(this.users);
-      return this.$store.getters.users;
+  watch: {
+    deleteActive() {
+      console.log(this.activeDelete);
+      console.log(this.id);
     },
-    ...mapGetters(['activeEdit'])
+  },
+  computed: {
+    // users() {
+    //   //console.log(this.users);
+    //   return this.$store.getters.users;
+    // },
+    ...mapGetters(["activeEdit", "users"]),
   },
   methods: {
+    openNotification(position = null) {
+      const noti = this.$vs.notification({
+        position,
+        title: "Success",
+        text: `Create Success`,
+      });
+    },
+
     //...mapActions(['createUser']);
     create() {
       this.$store.dispatch("createUser", this.user);
+      this.openNotification("top-right");
       this.activeCreate = false;
+      this.user={};
     },
-    ...mapMutations(['setActiveEdit']),
-    edit(id){
-        this.$store.dispatch('editUser',id);
-    }
-
-
+    ...mapMutations(["setActiveEdit"]),
+    edit(id) {
+      this.$store.dispatch("editUser", id);
+    },
+    deleteUser() {
+      this.$store.dispatch("deleteUser", this.id);
+      this.activeDelete = false;
+    },
   },
 
   created() {},
   mounted() {
-    console.log(this.users);
     this.$store.dispatch("setUsers");
+    console.log(this.users);
   },
   components: {
     ValidationProvider,

@@ -13,26 +13,42 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function getList(){
+    public function getList()
+    {
         return $this->userRepository->getListWithRole();
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $data = [
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'role_id' => $request->input('role_id'),
             'password' => Hash::make('123123'),
         ];
-        return $this->userRepository->create($data);
+        $user = $this->userRepository->create($data);
+        return $this->userRepository->getUserWithRole($user->id);
     }
 
-    public function edit($id,Request $request){
+    public function edit($id, Request $request)
+    {
         $data = [
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'role_id' => $request->input('role_id'),
         ];
-        return $this->userRepository->update($id,$data);
+        $user = $this->userRepository->update($id, $data);
+        return $this->userRepository->getUserWithRole($user->id);
+    }
+
+    public function delete($id)
+    {
+        if ($this->userRepository->delete($id))
+            return response()->json([
+                'response' => 'success',
+            ])->setStatusCode(200);
+        else return response()->json([
+            'response' => 'fail',
+        ])->setStatusCode(500);
     }
 }

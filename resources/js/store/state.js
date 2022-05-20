@@ -1,5 +1,6 @@
 export default {
-    userActive:{},
+    userLogin:{},
+    isLoggin:false,
     users:[],
     user:{},
     activeEdit:false,

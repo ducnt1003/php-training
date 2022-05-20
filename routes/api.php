@@ -31,9 +31,11 @@ Route::prefix('auth')->middleware('api')->group(function(){
 
 Route::prefix('users')->middleware('auth:api')->group(function(){
     Route::get('/',[UserController::class,'getList']);
-    Route::post('/create',[UserController::class,'create']);
+    Route::post('/create',[UserController::class,'create'])->middleware('role:Admin');
+    Route::post('/edit/{id}',[UserController::class,'edit']);
+    Route::delete('delete/{id}',[UserController::class,'delete']);
 
 
 });
-Route::post('users/edit/{id}',[UserController::class,'edit']);
+
 

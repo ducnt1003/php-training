@@ -1,6 +1,6 @@
 <template>
   <div class="error">
-    <div class="number">404</div>
+    <div class="number">403</div>
     <div class="text">
       <span> Access Forbidden</span>
       <br />
@@ -20,7 +20,7 @@
 </template>
 <script>
 export default {
-  data() {},
+
 };
 </script>
 
