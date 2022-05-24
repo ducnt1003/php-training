@@ -1,5 +1,6 @@
 <template>
   <div class="error">
+      <navbar />
     <div class="number">500</div>
     <div class="text">
       <span> Ooops.....</span>
@@ -20,8 +21,11 @@
   </div>
 </template>
 <script>
+import Navbar from "../Navbar.vue";
 export default {
-
+components: {
+    Navbar: Navbar,
+  },
 };
 </script>
 

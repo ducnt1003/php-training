@@ -17,7 +17,8 @@ export default {
     }) {
         getUser()
             .then((res) => {
-                commit('setUsers', res.data)
+                // /console.log(res);
+                commit('setUsers', res.data);
             });
     },
     createUser({

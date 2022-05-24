@@ -4,14 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Repositories\User\UserRepository;
+use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function __construct()
+    protected $userController;
+    public function __construct(UserController $userController)
     {
         $this->middleware('auth:api', ['except' => ['login']]);
+        $this->userController = $userController;
     }
 
     /**
@@ -73,12 +77,12 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $user = Auth::user();
+        $user = $this->userController->find(Auth::user()->id);
         return response()->json([
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::factory()->getTTL() * 60
+            'expires_in' => Auth::factory()->getTTL() * 1
         ]);
     }
 }

@@ -1,8 +1,11 @@
 export default {
-    userLogin:{},
-    isLoggin:false,
-    users:[],
-    user:{},
-    activeEdit:false,
+    userLogin: {
+        name: 'hihi',
+        role: 'Admin'
+    },
+    isLoggin: false,
+    users: [],
+    user: {},
+    activeEdit: false,
 
 };

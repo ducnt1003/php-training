@@ -11,7 +11,7 @@ import Error404Component from './components/errors/404Component.vue';
 import Error403Component from './components/errors/403Component.vue';
 import Error500Component from './components/errors/500Component.vue';
 const routes = [{
-        name: 'example',
+        name: 'home',
         path: '/',
         component: ExampleComponent
     },
@@ -23,25 +23,27 @@ const routes = [{
     {
         name: 'users',
         path: '/users',
-        component: UserComponent
+        component: UserComponent,
+        meta: {
+            role: ["SuperAdmin","Admin"]
+        }
     },
     {
-        path: '/:pathMatch(.*)*',
-        name: '/404',
-        component: Error404Component
-    },
-
-    {
-        name: 'errors403',
-        path: '/403',
+        name: 'error403',
+        path: '/error403',
         component: Error403Component,
 
     },
     {
-        name: 'errors500',
-        path: '/500',
+        name: 'error500',
+        path: '/error500',
         component: Error500Component,
 
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: '/error404',
+        component: Error404Component
     },
 ];
 
@@ -51,6 +53,8 @@ export const router = new VueRouter({
 });
 router.beforeEach((to, from, next) => {
     // chuyển đến trang login nếu chưa được login
+    const role  = to.meta.role|| [];
+    const role_user = localStorage.getItem('roleuser');
     const publicPages = ['/login'];
     const authRequired = !publicPages.includes(to.path);
     const loggedIn = localStorage.getItem('usertoken');
@@ -58,8 +62,11 @@ router.beforeEach((to, from, next) => {
     if (authRequired && !loggedIn) {
         localStorage.setItem("redirectPath", to.path);
         return next('/login');
-    } else if (authRequired && loggedIn){
-        return next();
+    }
+    if(loggedIn){
+        if (role.length && !role.includes(role_user)) {
+            return next({name:'error403'});
+        }
     }
 
     next();

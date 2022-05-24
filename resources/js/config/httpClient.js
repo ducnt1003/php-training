@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueAxios from 'vue-axios';
 import axios from 'axios';
+import { router } from "../router";
 Vue.use(VueAxios, axios);
 
 
@@ -10,7 +11,8 @@ const httpClient = axios.create({
     // headers: {
     //     "Content-Type": "application/json",
     // },
-});
+})
+
 
 function SET_AUTH_TOKEN( accessToken) {
     if(accessToken){
@@ -20,7 +22,18 @@ function SET_AUTH_TOKEN( accessToken) {
     }
 
 }
-//httpClient.interceptors.request.use(SET_AUTH_TOKEN(localStorage.usertoken));
+
+httpClient.interceptors.response.use(response => {
+    return response;
+}, error => {
+    if (error.response.status === 401) {
+        console.log(error.response.data.response)
+        router.push({name:"login"});
+        /* THIS WORKS BUT BREAKS THE LOGIN ERROR HANDLING */
+
+    }
+    return Promise.reject(error);
+});
 export {httpClient,SET_AUTH_TOKEN}
 
 

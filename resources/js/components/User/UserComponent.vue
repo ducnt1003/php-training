@@ -1,23 +1,23 @@
 <template>
   <div>
     <navbar />
-    <vs-row>
+    <vs-row class="mt-5">
       <vs-table>
         <template #header>
           <vs-input v-model="search" border placeholder="Search" />
         </template>
         <template #thead>
-          <vs-tr >
-            <vs-th sort @click="users = $vs.sortData($event, users, 'id')">
+          <vs-tr>
+            <vs-th style="width:10%" sort @click="usersx = $vs.sortData($event, usersx, 'id')">
               Id
             </vs-th>
-            <vs-th sort @click="users = $vs.sortData($event, users, 'email')">
+            <vs-th sort @click="usersx = $vs.sortData($event, usersx, 'email')">
               Email
             </vs-th>
-            <vs-th sort @click="users = $vs.sortData($event, users, 'name')">
+            <vs-th sort @click="usersx = $vs.sortData($event, usersx, 'name')">
               Name
             </vs-th>
-            <vs-th sort @click="users = $vs.sortData($event, users, 'role')">
+            <vs-th sort @click="usersx = $vs.sortData($event, usersx, 'role')">
               Role
             </vs-th>
             <vs-th
@@ -32,7 +32,7 @@
         <template #tbody>
           <vs-tr
             :key="i"
-            v-for="(tr, i) in $vs.getPage(users, page, max)"
+            v-for="(tr, i) in $vs.getPage(usersx, page, max)"
             :data="tr"
           >
             <vs-td>
@@ -61,7 +61,7 @@
           </vs-tr>
         </template>
         <template #footer>
-          <vs-pagination v-model="page" :length="$vs.getLength(users, max)" />
+          <vs-pagination v-model="page" :length="$vs.getLength(usersx, max)" />
         </template>
       </vs-table>
     </vs-row>
@@ -169,12 +169,19 @@ export default {
       activeDelete: false,
       id: "",
       name: "",
+      usersx: [],
     };
   },
   watch: {
     deleteActive() {
       console.log(this.activeDelete);
       console.log(this.id);
+    },
+    users(newVal) {
+      this.usersx = newVal;
+    },
+    search(newVal) {
+      this.usersx = this.getSearch(newVal);
     },
   },
   computed: {
@@ -198,7 +205,7 @@ export default {
       this.$store.dispatch("createUser", this.user);
       this.openNotification("top-right");
       this.activeCreate = false;
-      this.user={};
+      this.user = {};
     },
     ...mapMutations(["setActiveEdit"]),
     edit(id) {
@@ -208,12 +215,20 @@ export default {
       this.$store.dispatch("deleteUser", this.id);
       this.activeDelete = false;
     },
+    getSearch(key) {
+      if (key != "") {
+        return this.users.filter((user) => user.name.search(key) > -1);
+      } else {
+        return this.users;
+      }
+    },
   },
 
-  created() {},
-  mounted() {
+  created() {
     this.$store.dispatch("setUsers");
-    console.log(this.users);
+  },
+  mounted() {
+    //console.log(this.users);
   },
   components: {
     ValidationProvider,

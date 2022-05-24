@@ -41,6 +41,10 @@ class UserService
         return $this->userRepository->getUserWithRole($user->id);
     }
 
+    public function find($id){
+        return $this->userRepository->getUserWithRole($id);
+    }
+
     public function delete($id)
     {
         if ($this->userRepository->delete($id))

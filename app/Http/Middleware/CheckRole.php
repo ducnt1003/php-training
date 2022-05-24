@@ -17,7 +17,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        if (!$request->user()->hasRole($role)) {
+        if (!$request->user()->hasBiggerRole($role)) {
 
             $response = ['error' => 'This action is access denied!'];
 

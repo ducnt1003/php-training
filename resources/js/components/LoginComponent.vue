@@ -181,11 +181,12 @@ export default {
         .then((res) => {
           SET_AUTH_TOKEN(res.data.access_token);
           localStorage.setItem("usertoken", res.data.access_token);
+          localStorage.setItem("roleuser", res.data.user.role);
           this.$store.dispatch("login", res.data.user);
+          //console.log(res.data);
           this.user = {};
-            console.log(localStorage.getItem("redirectPath"));
           this.$router.replace(
-            localStorage.redirectPath || "/users"
+            localStorage.redirectPath || "/"
           );
           localStorage.removeItem("redirectPath");
         })

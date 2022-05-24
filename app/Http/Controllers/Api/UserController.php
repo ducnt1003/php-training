@@ -20,6 +20,10 @@ class UserController extends Controller
         return $this->userService->getList();
     }
 
+    public function find($id){
+        return $this->userService->find($id);
+    }
+
     public function create(UserRequest $request){
         return $this->userService->create($request);
     }

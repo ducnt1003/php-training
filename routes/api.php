@@ -30,7 +30,7 @@ Route::prefix('auth')->middleware('api')->group(function(){
 });
 
 Route::prefix('users')->middleware('auth:api')->group(function(){
-    Route::get('/',[UserController::class,'getList']);
+    Route::get('/',[UserController::class,'getList'])->middleware('role:Admin');
     Route::post('/create',[UserController::class,'create'])->middleware('role:Admin');
     Route::post('/edit/{id}',[UserController::class,'edit']);
     Route::delete('delete/{id}',[UserController::class,'delete']);

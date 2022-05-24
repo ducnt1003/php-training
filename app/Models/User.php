@@ -59,6 +59,14 @@ class User extends Authenticatable implements JWTSubject
         return false;
     }
 
+    public function hasBiggerRole($role){
+        $rolex = Role::where('role',$role)->first();
+        if($this->role()->first()->id <= $rolex->id){
+            return true;
+        }
+        return false;
+    }
+
        /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
