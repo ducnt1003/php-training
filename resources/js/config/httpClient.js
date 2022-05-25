@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueAxios from 'vue-axios';
 import axios from 'axios';
 import { router } from "../router";
+import store from '../store/store';
 Vue.use(VueAxios, axios);
 
 
@@ -27,10 +28,13 @@ httpClient.interceptors.response.use(response => {
     return response;
 }, error => {
     if (error.response.status === 401) {
-        console.log(error.response.data.response)
+        console.log(error.response);
         router.push({name:"login"});
-        /* THIS WORKS BUT BREAKS THE LOGIN ERROR HANDLING */
-
+        store.state.errors=error.response.data;
+        localStorage.removeItem('usertoken');
+        localStorage.removeItem('user');
+    } else if (error.response.status === 500){
+        router.push({name:"error500"});
     }
     return Promise.reject(error);
 });

@@ -13,12 +13,22 @@
           w="10"
           offset="1"
         >
-          <vs-input
-            label="Name"
-            state="dark"
-            v-model="user.name"
-            placeholder="Name"
-          ></vs-input>
+          <ValidationProvider
+            vid="name"
+            name="name"
+            rules="required"
+            v-slot="{ errors }"
+          >
+            <vs-input
+              label="Name"
+              state="dark"
+              v-model="user.name"
+              placeholder="Name"
+              ><template v-if="errors" #message-danger>
+                {{ errors[0] }}
+              </template></vs-input
+            >
+          </ValidationProvider>
         </vs-col>
       </vs-row>
       <vs-row class="mt-5">
@@ -29,12 +39,22 @@
           w="10"
           offset="1"
         >
+        <ValidationProvider
+                vid="email"
+                name="email"
+                rules="required|email"
+                v-slot="{ errors }"
+              >
           <vs-input
             label="Email"
             state="dark"
             v-model="user.email"
             placeholder="Email"
-          ></vs-input>
+          ><template v-if="errors" #message-danger>
+                    {{ errors[0] }}
+                  </template></vs-input
+                >
+              </ValidationProvider>
         </vs-col>
       </vs-row>
       <vs-row class="mt-5">
@@ -68,10 +88,21 @@
 </template>
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import { ValidationProvider, extend, ValidationObserver } from "vee-validate";
+import { required, email, min } from "vee-validate/dist/rules";
+extend("required", {
+  ...required,
+  message: "This field is required",
+});
+extend("email", {
+  ...email,
+  message: "Invalid email address!",
+});
+
 export default {
   data() {
     return {
-        active:false,
+      active: false,
     };
   },
   watch: {
@@ -81,12 +112,12 @@ export default {
     //     // this.email = newVal.email;
     //     // this.role_id=newVal.role_id;
     // },
-    activeEdit(newVal,oldVal){
-        this.active = newVal
+    activeEdit(newVal, oldVal) {
+      this.active = newVal;
     },
-    active(){
-        console.log(this.active)
-    }
+    active() {
+      console.log(this.active);
+    },
   },
   computed: {
     ...mapGetters(["activeEdit", "user"]),
@@ -105,6 +136,9 @@ export default {
 
   created() {},
   mounted() {},
-  components: {},
+  components: {
+    ValidationProvider,
+    ValidationObserver,
+  },
 };
 </script>

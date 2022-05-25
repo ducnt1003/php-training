@@ -10,8 +10,8 @@
   </vs-row> -->
   <vs-navbar color="primary" text-white square center-collapsed>
     <template #left>
-      <vs-navbar-item @click="$router.push({name:'home'})"> Home </vs-navbar-item>
-      <vs-navbar-item @click="$router.push({name:'users'})"> Users </vs-navbar-item>
+      <router-link  class=" btn textWhite vs-navbar__item" to="/">Home</router-link>
+      <router-link  class=" btn textWhite vs-navbar__item" to="/users">Users</router-link>
     </template>
 
     <template #right>
@@ -34,6 +34,7 @@ export default {
           console.log(res);
           this.$router.push({ name: "login" });
           localStorage.removeItem("usertoken");
+          localStorage.removeItem('user');
         })
         .catch((err) => {
           console.log(err);
@@ -42,3 +43,4 @@ export default {
   },
 };
 </script>
+

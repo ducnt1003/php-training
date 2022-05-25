@@ -24,7 +24,7 @@ class UserRequest extends BaseRequest
     public function rules()
     {
         return [
-            'name' => 'required',
+            'name' => 'required|min:6',
             'email' => 'required|email|unique:users',
             'role_id' => 'required',
         ];

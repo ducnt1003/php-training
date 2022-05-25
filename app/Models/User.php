@@ -53,18 +53,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function hasRole($role){
-        if ($this->role()->where('role', $role)->first()) {
+        if ($this->role()->whereRole($role)->first()) {
             return true;
         }
         return false;
     }
 
-    public function hasBiggerRole($role){
-        $rolex = Role::where('role',$role)->first();
-        if($this->role()->first()->id <= $rolex->id){
-            return true;
-        }
-        return false;
+    public function scopeWhereRole($query,$arg){
+        return $query->where('role',$arg);
     }
 
        /**

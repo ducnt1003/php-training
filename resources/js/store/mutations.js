@@ -37,5 +37,8 @@ export default {
     delete(state, id){
         const index = state.users.findIndex((user) => user.id == id);
         state.users.splice(index,1);
+    },
+    setErrors(state, errors){
+        state.errors= errors;
     }
 };

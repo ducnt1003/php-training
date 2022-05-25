@@ -54,7 +54,8 @@ export const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     // chuyển đến trang login nếu chưa được login
     const role  = to.meta.role|| [];
-    const role_user = localStorage.getItem('roleuser');
+    const user = JSON.parse(localStorage.getItem('user'));
+    //const role_user = localStorage.getItem('roleuser');
     const publicPages = ['/login'];
     const authRequired = !publicPages.includes(to.path);
     const loggedIn = localStorage.getItem('usertoken');
@@ -64,7 +65,7 @@ router.beforeEach((to, from, next) => {
         return next('/login');
     }
     if(loggedIn){
-        if (role.length && !role.includes(role_user)) {
+        if (role.length && !role.includes(user.role)) {
             return next({name:'error403'});
         }
     }

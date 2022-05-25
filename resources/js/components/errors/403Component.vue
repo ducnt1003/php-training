@@ -1,6 +1,6 @@
 <template>
   <div class="error">
-    <navbar />
+    <Navbar />
     <div class="number">403</div>
     <div class="text">
       <span> Access Forbidden</span>

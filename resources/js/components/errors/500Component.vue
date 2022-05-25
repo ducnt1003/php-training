@@ -1,6 +1,6 @@
 <template>
   <div class="error">
-      <navbar />
+    <Navbar />
     <div class="number">500</div>
     <div class="text">
       <span> Ooops.....</span>
@@ -9,10 +9,7 @@
       <br />
       <div class="buttons-con">
         <div class="action-link-wrap">
-          <a
-            onclick="history.back(-1)"
-            class="link-button link-back-button"
-          >
+          <a onclick="history.back(-1)" class="link-button link-back-button">
             Go Back
           </a>
         </div>
@@ -23,7 +20,7 @@
 <script>
 import Navbar from "../Navbar.vue";
 export default {
-components: {
+  components: {
     Navbar: Navbar,
   },
 };
@@ -74,7 +71,6 @@ div {
 
 .buttons-con .action-link-wrap {
   margin-top: 40px;
-
 }
 .buttons-con .action-link-wrap a {
   background: #68c950;

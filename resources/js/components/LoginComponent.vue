@@ -152,6 +152,7 @@ import { extend } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
 import { login } from "../config/config.api";
 import { httpClient, injectToken, SET_AUTH_TOKEN } from "../config/httpClient";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 extend("required", {
   ...required,
@@ -175,15 +176,22 @@ export default {
       popup_content: "Please re-enter your email and password",
     };
   },
+  computed: {
+      ...mapGetters(["errors"]),
+  },
+  mounted() {
+    if(this.errors != ''){
+        this.openNotification("top-right");
+    }
+  },
   methods: {
     login() {
       login(this.user)
         .then((res) => {
           SET_AUTH_TOKEN(res.data.access_token);
           localStorage.setItem("usertoken", res.data.access_token);
-          localStorage.setItem("roleuser", res.data.user.role);
+          localStorage.setItem("user", JSON.stringify(res.data.user));
           this.$store.dispatch("login", res.data.user);
-          //console.log(res.data);
           this.user = {};
           this.$router.replace(
             localStorage.redirectPath || "/"
@@ -198,6 +206,14 @@ export default {
           if (err.response.status == 401) {
             this.active = true;
           }
+        });
+    },
+    openNotification(position = null) {
+        console.log(this.errors);
+        const noti = this.$vs.notification({
+          position,
+          title: this.errors.response,
+          text: "Please Login Again",
         });
     },
   },

@@ -4,7 +4,9 @@ import {
     editUser,
     deleteUser
 } from "../config/config.api";
-import { router } from '../router';
+import {
+    router
+} from '../router';
 
 export default {
     login({
@@ -17,7 +19,7 @@ export default {
     }) {
         getUser()
             .then((res) => {
-                // /console.log(res);
+                console.log(res);
                 commit('setUsers', res.data);
             });
     },
@@ -27,11 +29,14 @@ export default {
         createUser(user)
             .then((res) => {
                 console.log(res.data)
-                commit('createUser', res.data)
-            }).catch((err)=>{
-                if(err.response.status == 403)
-                router.push({name:'errors403'});
-            });;
+                commit('createUser', res.data);
+                commit('setErrors','');
+            }).catch((err) => {
+                if (err.response.status === 403) console.log(err.response);
+                if (err.response.status === 422) {
+                    commit('setErrors',err.response.data.errors);
+                };
+            });
     },
     editUser({
         commit
@@ -54,9 +59,11 @@ export default {
     }, id) {
         deleteUser(id).then((res) => {
             console.log(res.data)
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log(err);
-            router.push({name:'errors500'});
+            router.push({
+                name: 'errors500'
+            });
         });
         commit('delete', id);
     }

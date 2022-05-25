@@ -30,10 +30,10 @@ Route::prefix('auth')->middleware('api')->group(function(){
 });
 
 Route::prefix('users')->middleware('auth:api')->group(function(){
-    Route::get('/',[UserController::class,'getList'])->middleware('role:Admin');
-    Route::post('/create',[UserController::class,'create'])->middleware('role:Admin');
-    Route::post('/edit/{id}',[UserController::class,'edit']);
-    Route::delete('delete/{id}',[UserController::class,'delete']);
+    Route::get('/',[UserController::class,'getList'])->middleware('role:SuperAdmin;Admin');
+    Route::post('/create',[UserController::class,'create'])->middleware('role:SuperAdmin');
+    Route::post('/edit/{id}',[UserController::class,'edit'])->middleware('role:SuperAdmin');;
+    Route::delete('delete/{id}',[UserController::class,'delete'])->middleware('role:SuperAdmin');;
 
 
 });

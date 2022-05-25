@@ -17,13 +17,15 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        if (!$request->user()->hasBiggerRole($role)) {
-
-            $response = ['error' => 'This action is access denied!'];
-
-            return response()->json([ $response])->setStatusCode(403);
+        $token = strtok($role, ";");
+        while ($token !== false) {
+            if ($request->user()->hasRole($token)){
+                return $next($request);
+            }
+            $token = strtok(";");
         }
-        //return $request->user()->role();
-        return $next($request);
+        $response = ['error' => 'This action is access denied!'];
+
+        return response()->json([$response])->setStatusCode(403);
     }
 }

@@ -7,5 +7,6 @@ export default {
     users: [],
     user: {},
     activeEdit: false,
+    errors:'',
 
 };
