@@ -29,67 +29,66 @@
 
             <vs-col w="4">
               <vs-row justify="flex-end">
-                <vs-col w="2"
-                  ><vs-row justify="flex-end"
-                    ><vs-button transparent icon>
-                      <box-icon name="export"></box-icon> </vs-button></vs-row
-                ></vs-col>
-                <vs-col w="2"
-                  ><vs-row justify="flex-end"
-                    ><vs-button
-                      @click="activeOption = !activeOption"
-                      :active="activeOption"
-                      transparent
-                      icon
-                    >
-                      <box-icon name="menu"></box-icon>
-                    </vs-button>
-                    <ul
-                      v-if="activeOption"
-                      class="dropdown-menu dropdown-menu-right show"
-                    >
-                      <!-- <li>1</li>
+                <vs-button @click="exportUsers" transparent icon>
+                  <box-icon name="export"></box-icon> </vs-button
+                ><vs-button
+                  @click="activeOption = !activeOption"
+                  :active="activeOption"
+                  transparent
+                  icon
+                >
+                  <box-icon name="menu"></box-icon>
+                </vs-button>
+                <ul
+                  v-if="activeOption"
+                  class="dropdown-menu dropdown-menu-right show"
+                >
+                  <!-- <li>1</li>
                     <li>2</li> -->
-                      <vs-checkbox
-                        class="dropdown-item"
-                        val="id"
-                        v-model="options"
-                      >
-                        Id
-                      </vs-checkbox>
-                      <vs-checkbox
-                        class="dropdown-item"
-                        val="email"
-                        v-model="options"
-                      >
-                        Email
-                      </vs-checkbox>
-                      <vs-checkbox
-                        class="dropdown-item"
-                        val="name"
-                        v-model="options"
-                      >
-                        Name
-                      </vs-checkbox>
-                      <vs-checkbox
-                        class="dropdown-item"
-                        val="role"
-                        v-model="options"
-                      >
-                        Role
-                      </vs-checkbox>
-                    </ul>
-                  </vs-row>
-                </vs-col>
+                  <vs-checkbox class="dropdown-item" val="id" v-model="options">
+                    Id
+                  </vs-checkbox>
+                  <vs-checkbox
+                    class="dropdown-item"
+                    val="email"
+                    v-model="options"
+                  >
+                    Email
+                  </vs-checkbox>
+                  <vs-checkbox
+                    class="dropdown-item"
+                    val="name"
+                    v-model="options"
+                  >
+                    Name
+                  </vs-checkbox>
+                  <vs-checkbox
+                    class="dropdown-item"
+                    val="role"
+                    v-model="options"
+                  >
+                    Role
+                  </vs-checkbox>
+                  <vs-checkbox v-if="check_role == 'SuperAdmin'" class="dropdown-item" v-model="action">
+                    Action
+                  </vs-checkbox>
+                </ul>
               </vs-row>
             </vs-col>
           </vs-row>
         </template>
         <template #thead>
           <vs-tr>
+            <vs-th  v-if="check_role == 'SuperAdmin'" style="width: 3%">
+              <vs-checkbox
+                :indeterminate="selected.length == users.length"
+                v-model="allCheck"
+                @change="selected = $vs.checkAll(selected, users)"
+              />
+            </vs-th>
             <vs-th
               v-if="options.includes('id')"
-              style="width: 10%"
+              style="width: 7%"
               sort
               @click="usersx = $vs.sortData($event, usersx, 'id')"
             >
@@ -119,13 +118,20 @@
             >
               Role
             </vs-th>
-            <vs-th v-if="check_role == 'SuperAdmin'"
-            style="width: 20%"
+            <vs-th
+              v-if="check_role == 'SuperAdmin' && action"
+              style="width: 20%"
               ><vs-row justify="flex-end"
                 ><vs-button success @click="activeCreate = !activeCreate"
                   >Create</vs-button
-                ></vs-row
-              >
+                >
+                <vs-button
+                  @click="activeDeleteMulti = true"
+                  color="rgb(242, 19, 93)"
+                >
+                  Delete
+                </vs-button>
+              </vs-row>
             </vs-th>
           </vs-tr>
         </template>
@@ -134,7 +140,9 @@
             :key="i"
             v-for="(tr, i) in $vs.getPage(usersx, page, max)"
             :data="tr"
+            :is-selected="!!selected.includes(tr)"
           >
+            <vs-td v-if="check_role == 'SuperAdmin'"><vs-checkbox :val="tr.id" v-model="selected" /></vs-td>
             <vs-td v-if="options.includes('id')">
               {{ tr.id }}
             </vs-td>
@@ -147,16 +155,16 @@
             <vs-td v-if="options.includes('role')">
               {{ tr.role }}
             </vs-td>
-            <vs-td v-if="check_role == 'SuperAdmin'">
-              <vs-row justify="flex-end">
+            <vs-td v-if="check_role == 'SuperAdmin' && action">
+              <vs-row align="center" justify="flex-end">
                 <vs-button @click="edit(tr.id)"> Edit </vs-button>
                 <vs-button
                   @click="(id = tr.id), (name = tr.name), (activeDelete = true)"
                   color="rgb(242, 19, 93)"
                 >
                   Delete
-                </vs-button></vs-row
-              >
+                </vs-button>
+              </vs-row>
             </vs-td>
           </vs-tr>
         </template>
@@ -275,6 +283,23 @@
         </div>
       </template>
     </vs-dialog>
+    <vs-dialog width="550px" not-center v-model="activeDeleteMulti">
+      <template #header>
+        <h4 class="not-margin">Delete Users</h4>
+      </template>
+      <p>Are you sure to delete all selected user</p>
+
+      <template #footer>
+        <div class="con-footer">
+          <vs-row justify="flex-end">
+            <vs-button @click="deleteUsers" transparent> Ok </vs-button>
+            <vs-button @click="activeDeleteMulti = false" dark transparent>
+              Cancel
+            </vs-button></vs-row
+          >
+        </div>
+      </template>
+    </vs-dialog>
   </div>
 </template>
 <script>
@@ -291,6 +316,7 @@ extend("email", {
   message: "Invalid email address!",
 });
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 export default {
   data() {
     return {
@@ -304,6 +330,7 @@ export default {
       search: "",
       activeCreate: false,
       activeDelete: false,
+      activeDeleteMulti: false,
       id: "",
       name: "",
       usersx: [],
@@ -312,6 +339,10 @@ export default {
       errorsCreate: [],
       options: ["id", "name", "email", "role"],
       activeOption: false,
+      delete_id: [],
+      allCheck: false,
+      selected: [],
+      action: true,
     };
   },
   watch: {
@@ -376,14 +407,25 @@ export default {
         this.user = {};
       }
     },
+    openNotificationSelected(position = null) {
+      const noti = this.$vs.notification({
+        position,
+        title: "Errors",
+        text: "Please select at least 1 user",
+      });
+    },
 
     //...mapActions(['createUser']);
     create() {
       this.$store.dispatch("createUser", this.user);
-      // this.openNotification("top-right");
+      this.openNotification("top-right");
 
-      //   this.activeCreate = false;
-      //   this.user = {};
+      this.activeCreate = false;
+      this.user = {
+        name: "",
+        email: "",
+        role_id: -1,
+      };
     },
     ...mapMutations(["setActiveEdit"]),
     edit(id) {
@@ -392,6 +434,16 @@ export default {
     deleteUser() {
       this.$store.dispatch("deleteUser", this.id);
       this.activeDelete = false;
+    },
+    deleteUsers() {
+      //console.log(this.selected)
+      if (this.selected.length > 0) {
+        this.$store.dispatch("deleteUsers", this.selected);
+        this.selected = [];
+        this.activeDeleteMulti = false;
+      } else {
+        this.openNotificationSelected("top-right");
+      }
     },
     getSearch(array, key) {
       if (key != "") {
@@ -406,6 +458,9 @@ export default {
       } else {
         return array;
       }
+    },
+    exportUsers() {
+      this.$store.dispatch("exportUsers", this.options);
     },
   },
 

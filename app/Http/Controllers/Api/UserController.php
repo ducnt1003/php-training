@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use App\Exports\UsersExport;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -34,5 +37,17 @@ class UserController extends Controller
 
     public function delete($id){
         return $this->userService->delete($id);
+    }
+
+    public function deleteMulti(Request $request){
+        return $this->userService->deleteMulti($request);
+    }
+
+    public function export(Request $request)
+    {
+        //return $request;
+        //$arrays = ['name','email'];
+        return (new UsersExport($request->options))->download('users.xlsx');
+
     }
 }

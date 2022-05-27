@@ -1,9 +1,13 @@
+import {
+    multiply
+} from "lodash";
+
 export default {
-    login(state,user){
+    login(state, user) {
         state.userLogin = user;
         state.isLogin = true;
     },
-    logout(state){
+    logout(state) {
         state.userLogin = {};
         state.isLogin = false;
     },
@@ -34,11 +38,17 @@ export default {
         console.log(state.users);
         state.user = {};
     },
-    delete(state, id){
+    delete(state, id) {
         const index = state.users.findIndex((user) => user.id == id);
-        state.users.splice(index,1);
+        state.users.splice(index, 1);
     },
-    setErrors(state, errors){
-        state.errors= errors;
+    delete_multi(state, selected) {
+        selected.forEach(id => {
+            let index = state.users.findIndex((user) => user.id == id);
+            state.users.splice(index, 1);
+        });
+    },
+    setErrors(state, errors) {
+        state.errors = errors;
     }
 };

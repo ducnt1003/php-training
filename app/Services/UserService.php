@@ -41,7 +41,8 @@ class UserService
         return $this->userRepository->getUserWithRole($user->id);
     }
 
-    public function find($id){
+    public function find($id)
+    {
         return $this->userRepository->getUserWithRole($id);
     }
 
@@ -54,5 +55,20 @@ class UserService
         else return response()->json([
             'response' => 'fail',
         ])->setStatusCode(500);
+    }
+
+    public function deleteMulti(Request $request)
+    {
+        $ids = $request->input('selected');
+        foreach ($ids as $id) {
+            if (!$this->userRepository->delete($id)) {
+                return response()->json([
+                    'response' => 'fail',
+                ])->setStatusCode(500);
+            }
+        }
+        return response()->json([
+            'response' => 'success',
+        ])->setStatusCode(200);
     }
 }
