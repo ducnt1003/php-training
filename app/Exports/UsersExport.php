@@ -4,61 +4,38 @@ namespace App\Exports;
 
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
 
-class UsersExport implements FromArray, WithHeadings,WithColumnWidths
+
+class UsersExport implements FromQuery, WithHeadings, WithColumnWidths, WithMapping
 {
     use Exportable;
 
-    public function __construct($columns)
+    public function __construct(HttpRequest $data)
     {
-        $this->columns = $columns;
-    }
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function array(): array
-    {
-        $users = DB::table('users')->join('roles','users.role_id','=','roles.id')
-        ->select('users.id','users.name','users.email','roles.role')->get();
-        $selectedusers = [];
-        $arrays = $this->columns;
-        foreach($users as $user){
-            $selecteduser = [];
-            foreach($arrays as $array){
-                $selecteduser[$array] = $user->$array;
-            }
-            array_push($selectedusers,$selecteduser);
-        }
-        return $selectedusers;
+        $this->columns = $data->options;
+        $this->search = $data->search;
+        //$this->sort = $request->sort;
+        $this->role_id = $data->role_id;
     }
 
-    // public function array(): array
-    // {
-    //     $selectedusers = [];
-    //     DB::table('users')->join('roles','users.role_id','=','roles.id')
-    //     ->select('users.id','users.name','users.email','roles.role')->chunk(10, function ($users) {
-    //         foreach($users as $user){
-    //             $selecteduser = [];
-    //             foreach($this->columns as $array){
-    //                 $selecteduser[$array] = $user->$array;
-    //             }
-    //             array_push($selectedusers,$selecteduser);
-    //         }
-    //     });
-
-    //     return $selectedusers;
-    // }
+    public function query()
+    {
+        return User::select('id','name','email','role_id')->with(['role'])->orderBy('users.id', 'asc');
+    }
 
     public function headings(): array
     {
-        return array_map('ucfirst',$this->columns);
+        return array_map('ucfirst', $this->columns);
     }
 
     public function columnWidths(): array
@@ -69,5 +46,19 @@ class UsersExport implements FromArray, WithHeadings,WithColumnWidths
             'C' => 40,
             'D' => 20
         ];
+    }
+
+    public function map($user): array
+    {
+        $select = [];
+        foreach ($this->columns as $array){
+            if($array == "role" ){
+                array_push($select,$user[$array]['role']);
+            }else{
+                array_push($select,$user[$array]);
+            }
+
+        }
+        return $select;
     }
 }

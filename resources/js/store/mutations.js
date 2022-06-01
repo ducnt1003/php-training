@@ -43,8 +43,8 @@ export default {
         state.users.splice(index, 1);
     },
     delete_multi(state, selected) {
-        selected.forEach(id => {
-            let index = state.users.findIndex((user) => user.id == id);
+        selected.forEach(select => {
+            let index = state.users.findIndex((user) => user.id == select.id);
             state.users.splice(index, 1);
         });
     },

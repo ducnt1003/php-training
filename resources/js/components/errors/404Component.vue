@@ -5,13 +5,13 @@
     <div class="text">
       <span> Ooops.....</span>
       <br />
-      Page Not Found
+      {{$t("notfound")}}
       <br />
       <div class="buttons-con">
         <div class="action-link-wrap">
-          <a onclick="history.back(-1)" class="link-button link-back-button">
-            Go Back
-          </a>
+          <router-link to="/" class="link-button link-back-button">
+            {{$t("home")}}
+          </router-link>
         </div>
       </div>
     </div>

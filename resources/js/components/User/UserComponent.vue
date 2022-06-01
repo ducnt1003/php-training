@@ -43,8 +43,6 @@
                   v-if="activeOption"
                   class="dropdown-menu dropdown-menu-right show"
                 >
-                  <!-- <li>1</li>
-                    <li>2</li> -->
                   <vs-checkbox class="dropdown-item" val="id" v-model="options">
                     Id
                   </vs-checkbox>
@@ -60,16 +58,20 @@
                     val="name"
                     v-model="options"
                   >
-                    Name
+                    {{ $t("name") }}
                   </vs-checkbox>
                   <vs-checkbox
                     class="dropdown-item"
                     val="role"
                     v-model="options"
                   >
-                    Role
+                    {{ $t("role") }}
                   </vs-checkbox>
-                  <vs-checkbox v-if="check_role == 'SuperAdmin'" class="dropdown-item" v-model="action">
+                  <vs-checkbox
+                    v-if="check_role == 'SuperAdmin'"
+                    class="dropdown-item"
+                    v-model="action"
+                  >
                     Action
                   </vs-checkbox>
                 </ul>
@@ -79,7 +81,7 @@
         </template>
         <template #thead>
           <vs-tr>
-            <vs-th  v-if="check_role == 'SuperAdmin'" style="width: 3%">
+            <vs-th v-if="check_role == 'SuperAdmin'" style="width: 3%">
               <vs-checkbox
                 :indeterminate="selected.length == users.length"
                 v-model="allCheck"
@@ -90,7 +92,9 @@
               v-if="options.includes('id')"
               style="width: 7%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'id')"
+              @click="
+                usersx = $vs.sortData($event, usersx, 'id');sort = editSort('id')
+              "
             >
               Id
             </vs-th>
@@ -98,7 +102,7 @@
               v-if="options.includes('email')"
               style="width: 40%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'email')"
+              @click="usersx = $vs.sortData($event, usersx, 'email');sort = editSort('email')"
             >
               Email
             </vs-th>
@@ -106,30 +110,30 @@
               v-if="options.includes('name')"
               style="width: 20%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'name')"
+              @click="usersx = $vs.sortData($event, usersx, 'name');sort = editSort('name')"
             >
-              Name
+              {{ $t("name") }}
             </vs-th>
             <vs-th
               v-if="options.includes('role')"
               style="width: 10%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'role')"
+              @click="usersx = $vs.sortData($event, usersx, 'role');sort = editSort('role')"
             >
-              Role
+              {{ $t("role") }}
             </vs-th>
             <vs-th
               v-if="check_role == 'SuperAdmin' && action"
               style="width: 20%"
               ><vs-row justify="flex-end"
-                ><vs-button success @click="activeCreate = !activeCreate"
-                  >Create</vs-button
-                >
+                ><vs-button success @click="activeCreate = !activeCreate">{{
+                  $t("create")
+                }}</vs-button>
                 <vs-button
                   @click="activeDeleteMulti = true"
                   color="rgb(242, 19, 93)"
                 >
-                  Delete
+                  {{ $t("delete") }}
                 </vs-button>
               </vs-row>
             </vs-th>
@@ -142,7 +146,9 @@
             :data="tr"
             :is-selected="!!selected.includes(tr)"
           >
-            <vs-td v-if="check_role == 'SuperAdmin'"><vs-checkbox :val="tr.id" v-model="selected" /></vs-td>
+            <vs-td v-if="check_role == 'SuperAdmin'"
+              ><vs-checkbox v-if="tr.id != 1" :val="tr" v-model="selected"
+            /></vs-td>
             <vs-td v-if="options.includes('id')">
               {{ tr.id }}
             </vs-td>
@@ -157,12 +163,12 @@
             </vs-td>
             <vs-td v-if="check_role == 'SuperAdmin' && action">
               <vs-row align="center" justify="flex-end">
-                <vs-button @click="edit(tr.id)"> Edit </vs-button>
+                <vs-button @click="edit(tr.id)"> {{ $t("edit") }} </vs-button>
                 <vs-button
                   @click="(id = tr.id), (name = tr.name), (activeDelete = true)"
                   color="rgb(242, 19, 93)"
                 >
-                  Delete
+                  {{ $t("delete") }}
                 </vs-button>
               </vs-row>
             </vs-td>
@@ -176,7 +182,7 @@
     <ValidationObserver ref="form" v-slot="{ handleSubmit }">
       <vs-dialog width="550px" not-center v-model="activeCreate">
         <template #header>
-          <h4 class="not-margin">Create new User</h4>
+          <h4 class="not-margin">{{ $t("create") }}</h4>
         </template>
 
         <div>
@@ -195,7 +201,7 @@
                 v-slot="{ errors }"
               >
                 <vs-input
-                  label="Name"
+                  label="name"
                   state="dark"
                   v-model="user.name"
                   placeholder="Name"
@@ -343,6 +349,10 @@ export default {
       allCheck: false,
       selected: [],
       action: true,
+      sort: {
+        key: "",
+        type: 0,
+      },
     };
   },
   watch: {
@@ -380,6 +390,12 @@ export default {
     },
     options(newVal) {
       console.log(this.options);
+    },
+    selected(newVal) {
+      console.log(newVal);
+    },
+    sort(newVal) {
+      console.log(newVal);
     },
   },
   computed: {
@@ -460,7 +476,28 @@ export default {
       }
     },
     exportUsers() {
-      this.$store.dispatch("exportUsers", this.options);
+      this.$store.dispatch("exportUsers", {options : this.options,search: this.search,sort: this.sort,role_id:this.role_id});
+    },
+    editSort(key) {
+      if (this.sort.key == key) {
+        if (this.sort.type == 2) {
+          return {
+            key: key,
+            type: 0,
+          };
+        } else {
+          let a = this.sort.type+1;
+          return {
+            key: key,
+            type: a,
+          };
+        }
+      } else {
+        return {
+          key: key,
+          type: 1,
+        };
+      }
     },
   },
 

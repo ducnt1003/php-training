@@ -3,14 +3,14 @@
     <Navbar />
     <div class="number">403</div>
     <div class="text">
-      <span> Access Forbidden</span>
+      <span> {{$t("accessdeny")}}</span>
       <br />
 
       <div class="buttons-con">
         <div class="action-link-wrap">
-          <a onclick="history.back(-1)" class="link-button link-back-button">
-            Go Back
-          </a>
+          <router-link to="/" class="link-button link-back-button">
+            {{$t("home")}}
+          </router-link>
         </div>
       </div>
     </div>

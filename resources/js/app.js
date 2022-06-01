@@ -22,9 +22,9 @@ import 'boxicons'
 import App from './App.vue';
 import store from './store/store';
 import {router} from './router';
-
+import i18n from './i18n';
 
 
 const app = new Vue(Vue.util.extend({
-    router,store
+    router,store,i18n
 }, App)).$mount('#app');

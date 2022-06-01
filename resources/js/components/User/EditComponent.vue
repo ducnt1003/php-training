@@ -1,7 +1,7 @@
 <template>
   <vs-dialog width="550px" not-close not-center v-model="active">
     <template #header>
-      <h4 class="not-margin">Edit User</h4>
+      <h4 class="not-margin">{{$t('edit')}}</h4>
     </template>
 
     <div>

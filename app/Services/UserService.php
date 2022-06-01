@@ -59,9 +59,10 @@ class UserService
 
     public function deleteMulti(Request $request)
     {
-        $ids = $request->input('selected');
-        foreach ($ids as $id) {
-            if (!$this->userRepository->delete($id)) {
+
+        $selecteds = $request->input('selected');
+        foreach ($selecteds as $selected) {
+            if (!$this->userRepository->delete($selected['id'])) {
                 return response()->json([
                     'response' => 'fail',
                 ])->setStatusCode(500);

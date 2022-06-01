@@ -14,7 +14,7 @@ const createUser = (user) => httpClient.post('/users/create',user);
 const editUser = (id,user) => httpClient.post(`/users/edit/${id}`,user);
 const deleteUser = (id,user) => httpClient.delete(`/users/delete/${id}`);
 const deleteUsers = (selected) => httpClient.delete(`/users/delete-multi/`,{ data: { selected: selected } });
-const exportUsers = (options) => httpClient.post('users/export',{ options: options },{responseType:'arraybuffer'});
+const exportUsers = (options) => httpClient.post('users/export',options ,{responseType:'arraybuffer'});
 // function exportUsers(options){
 //     let http = httpClient;
 //     http.interceptors.request.use(
