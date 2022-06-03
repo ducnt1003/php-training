@@ -5,5 +5,6 @@ export default {
     user:(state)=>state.user,
     userLogin:(state)=>state.userLogin,
     errors:(state)=>state.errors,
+    success:(state)=>state.success,
 
 };

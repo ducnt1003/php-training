@@ -20,7 +20,7 @@
             v-slot="{ errors }"
           >
             <vs-input
-              label="Name"
+              :label="$t('name')"
               state="dark"
               v-model="user.name"
               placeholder="Name"
@@ -65,7 +65,7 @@
           w="10"
           offset="1"
         >
-          <vs-select label="Role" color="success" v-model="user.role_id">
+          <vs-select :label="$t('role')" color="success" v-model="user.role_id">
             <vs-option label="SuperAdmin" value="1"> SuperAdmin </vs-option>
             <vs-option label="Admin" value="2"> Admin </vs-option>
             <vs-option label="User" value="3"> User </vs-option>
@@ -77,9 +77,9 @@
     <template #footer>
       <div class="con-footer">
         <vs-row justify="flex-end">
-          <vs-button @click="update" transparent> Ok </vs-button>
+          <vs-button @click="update" transparent> {{ $t('ok') }} </vs-button>
           <vs-button @click="setActiveEdit" dark transparent>
-            Cancel
+            {{ $t('cancel') }}
           </vs-button></vs-row
         >
       </div>
@@ -92,11 +92,11 @@ import { ValidationProvider, extend, ValidationObserver } from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
 extend("required", {
   ...required,
-  message: "This field is required",
+  message: (_, values) => i18n.t('required', values),
 });
 extend("email", {
   ...email,
-  message: "Invalid email address!",
+  message: (_, values) => i18n.t('invalidemail', values),
 });
 
 export default {

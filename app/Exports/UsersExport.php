@@ -20,17 +20,31 @@ class UsersExport implements FromQuery, WithHeadings, WithColumnWidths, WithMapp
 {
     use Exportable;
 
-    public function __construct(HttpRequest $data)
+    public function __construct($data)
     {
         $this->columns = $data->options;
         $this->search = $data->search;
-        //$this->sort = $request->sort;
+        $this->sort = $data->sort;
         $this->role_id = $data->role_id;
     }
 
     public function query()
     {
-        return User::select('id','name','email','role_id')->with(['role'])->orderBy('users.id', 'asc');
+        $whereLike = [];
+        if ($this->search) {
+            array_push($whereLike, [DB::raw('BINARY `name`'), 'like', '%' . $this->search . '%']);
+        }
+        if ($this->role_id && $this->role_id != 4 && $this->role_id != 0) {
+            array_push($whereLike, ['role_id', $this->role_id]);
+        }
+        if ($this->sort['type'] == 0) {
+            $orderBy = ['id', 'asc'];
+        } else if ($this->sort['type'] == 1) {
+            $orderBy = [$this->sort['key'], 'asc'];
+        } else {
+            $orderBy = [$this->sort['key'], 'desc'];
+        }
+        return User::select('id', 'name', 'email', 'role_id')->where($whereLike)->with(['role'])->orderBy($orderBy[0], $orderBy[1]);
     }
 
     public function headings(): array
@@ -41,7 +55,7 @@ class UsersExport implements FromQuery, WithHeadings, WithColumnWidths, WithMapp
     public function columnWidths(): array
     {
         return [
-            'A' => 5,
+            'A' => 8,
             'B' => 30,
             'C' => 40,
             'D' => 20
@@ -51,13 +65,12 @@ class UsersExport implements FromQuery, WithHeadings, WithColumnWidths, WithMapp
     public function map($user): array
     {
         $select = [];
-        foreach ($this->columns as $array){
-            if($array == "role" ){
-                array_push($select,$user[$array]['role']);
-            }else{
-                array_push($select,$user[$array]);
+        foreach ($this->columns as $array) {
+            if ($array == "role") {
+                array_push($select, $user[$array]['role']);
+            } else {
+                array_push($select, $user[$array]);
             }
-
         }
         return $select;
     }

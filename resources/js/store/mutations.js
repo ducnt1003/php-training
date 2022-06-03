@@ -50,5 +50,8 @@ export default {
     },
     setErrors(state, errors) {
         state.errors = errors;
+    },
+    setSuccess(state, success) {
+        state.success = success;
     }
 };

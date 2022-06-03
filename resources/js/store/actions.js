@@ -21,7 +21,6 @@ export default {
     }) {
         getUser()
             .then((res) => {
-                console.log(res);
                 commit('setUsers', res.data);
             });
     },
@@ -30,9 +29,9 @@ export default {
     }, user) {
         createUser(user)
             .then((res) => {
-                console.log(res.data)
                 commit('createUser', res.data);
                 commit('setErrors', '');
+                commit('setSuccess', 'success');
             }).catch((err) => {
                 if (err.response.status === 403) console.log(err.response);
                 if (err.response.status === 422) {
@@ -90,5 +89,8 @@ export default {
             document.body.appendChild(fileLink);
             fileLink.click();
         })
+    },
+    setSuccess({commit}){
+        commit('setSuccess', '');
     }
 }

@@ -8,5 +8,6 @@ export default {
     user: {},
     activeEdit: false,
     errors:'',
+    success:''
 
 };

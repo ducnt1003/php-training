@@ -6,17 +6,19 @@
         <template #header>
           <vs-row>
             <vs-col w="6"
-              ><vs-input v-model="search" border placeholder="Search By Name"
+              ><vs-input v-model="search" border :placeholder="$t('search')"
             /></vs-col>
             <vs-col w="2">
               <vs-row justify="flex-start"
                 ><vs-col w="12"
                   ><vs-select
-                    placeholder="Role"
+                    :placeholder="$t('role')"
                     color="success"
                     v-model="role_id"
                   >
-                    <vs-option label="All" value="4"> All </vs-option>
+                    <vs-option :label="$t('all')" value="4">
+                      {{ $t("all") }}
+                    </vs-option>
                     <vs-option label="SuperAdmin" value="1">
                       SuperAdmin
                     </vs-option>
@@ -93,7 +95,8 @@
               style="width: 7%"
               sort
               @click="
-                usersx = $vs.sortData($event, usersx, 'id');sort = editSort('id')
+                usersx = $vs.sortData($event, usersx, 'id');
+                sort = editSort('id');
               "
             >
               Id
@@ -102,7 +105,10 @@
               v-if="options.includes('email')"
               style="width: 40%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'email');sort = editSort('email')"
+              @click="
+                usersx = $vs.sortData($event, usersx, 'email');
+                sort = editSort('email');
+              "
             >
               Email
             </vs-th>
@@ -110,7 +116,10 @@
               v-if="options.includes('name')"
               style="width: 20%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'name');sort = editSort('name')"
+              @click="
+                usersx = $vs.sortData($event, usersx, 'name');
+                sort = editSort('name');
+              "
             >
               {{ $t("name") }}
             </vs-th>
@@ -118,7 +127,10 @@
               v-if="options.includes('role')"
               style="width: 10%"
               sort
-              @click="usersx = $vs.sortData($event, usersx, 'role');sort = editSort('role')"
+              @click="
+                usersx = $vs.sortData($event, usersx, 'role_id');
+                sort = editSort('role_id');
+              "
             >
               {{ $t("role") }}
             </vs-th>
@@ -201,7 +213,7 @@
                 v-slot="{ errors }"
               >
                 <vs-input
-                  label="name"
+                  :label="$t('name')"
                   state="dark"
                   v-model="user.name"
                   placeholder="Name"
@@ -246,7 +258,11 @@
               w="10"
               offset="1"
             >
-              <vs-select label="Role" color="success" v-model="user.role_id">
+              <vs-select
+                :label="$t('role')"
+                color="success"
+                v-model="user.role_id"
+              >
                 <vs-option label="SuperAdmin" value="1"> SuperAdmin </vs-option>
                 <vs-option label="Admin" value="2"> Admin </vs-option>
                 <vs-option label="User" value="3"> User </vs-option>
@@ -261,10 +277,10 @@
           <div class="con-footer">
             <vs-row justify="flex-end">
               <vs-button @click="handleSubmit(create)" transparent>
-                Ok
+                {{ $t("ok") }}
               </vs-button>
               <vs-button @click="activeCreate = false" dark transparent>
-                Cancel
+                {{ $t("cancel") }}
               </vs-button></vs-row
             >
           </div>
@@ -274,16 +290,18 @@
     <EditComponent />
     <vs-dialog width="550px" not-center v-model="activeDelete">
       <template #header>
-        <h4 class="not-margin">Delete User</h4>
+        <h4 class="not-margin">{{ $t("delete") }}</h4>
       </template>
-      <p>Are you sure to delete user {{ name }} (id:{{ id }})</p>
+      <p>{{ $t("textdelete", { name: name }) }}</p>
 
       <template #footer>
         <div class="con-footer">
           <vs-row justify="flex-end">
-            <vs-button @click="deleteUser" transparent> Ok </vs-button>
+            <vs-button @click="deleteUser" transparent>
+              {{ $t("ok") }}
+            </vs-button>
             <vs-button @click="activeDelete = false" dark transparent>
-              Cancel
+              {{ $t("cancel") }}
             </vs-button></vs-row
           >
         </div>
@@ -291,16 +309,18 @@
     </vs-dialog>
     <vs-dialog width="550px" not-center v-model="activeDeleteMulti">
       <template #header>
-        <h4 class="not-margin">Delete Users</h4>
+        <h4 class="not-margin">{{ $t("delete") }}</h4>
       </template>
-      <p>Are you sure to delete all selected user</p>
+      <p>{{ $t("textdeleteall") }}</p>
 
       <template #footer>
         <div class="con-footer">
           <vs-row justify="flex-end">
-            <vs-button @click="deleteUsers" transparent> Ok </vs-button>
+            <vs-button @click="deleteUsers" transparent>
+              {{ $t("ok") }}
+            </vs-button>
             <vs-button @click="activeDeleteMulti = false" dark transparent>
-              Cancel
+              {{ $t("cancel") }}
             </vs-button></vs-row
           >
         </div>
@@ -309,17 +329,24 @@
   </div>
 </template>
 <script>
-import { ValidationProvider, extend, ValidationObserver } from "vee-validate";
+import {
+  ValidationProvider,
+  extend,
+  ValidationObserver,
+  localize,
+} from "vee-validate";
 import { required, email, min } from "vee-validate/dist/rules";
 import Navbar from "../Navbar.vue";
 import EditComponent from "./EditComponent.vue";
+import i18n from "../../i18n";
+
 extend("required", {
   ...required,
-  message: "This field is required",
+  message: (_, values) => i18n.t("required", values),
 });
 extend("email", {
   ...email,
-  message: "Invalid email address!",
+  message: (_, values) => i18n.t("invalidemail", values),
 });
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
@@ -388,36 +415,37 @@ export default {
         this.usersx = this.filterRole(this.users, newVal);
       }
     },
-    options(newVal) {
-      console.log(this.options);
-    },
-    selected(newVal) {
-      console.log(newVal);
-    },
-    sort(newVal) {
-      console.log(newVal);
-    },
+    success(newVal){
+        this.openNotification("top-right");
+        this.activeCreate = false;
+        this.user = {
+          name: "",
+          email: "",
+          role_id: -1,
+        };
+        this.$store.dispatch("setSuccess");
+    }
   },
   computed: {
     // users() {
     //   //console.log(this.users);
     //   return this.$store.getters.users;
     // },
-    ...mapGetters(["activeEdit", "users", "errors"]),
+    ...mapGetters(["activeEdit", "users", "errors","success"]),
   },
   methods: {
     openNotification(position = null) {
       if (this.errors != "") {
         const noti = this.$vs.notification({
           position,
-          title: "Error",
-          text: `Create Fail`,
+          title: this.$t("error"),
+          text: this.$t("createfail"),
         });
       } else {
         const noti = this.$vs.notification({
           position,
-          title: "Success",
-          text: `Create Success`,
+          title: this.$t("success"),
+          text: this.$t("createsuccess"),
         });
         this.activeCreate = false;
         this.user = {};
@@ -426,22 +454,15 @@ export default {
     openNotificationSelected(position = null) {
       const noti = this.$vs.notification({
         position,
-        title: "Errors",
-        text: "Please select at least 1 user",
+        title: this.$t("error"),
+        text: this.$t("errorselect"),
       });
     },
 
     //...mapActions(['createUser']);
     create() {
       this.$store.dispatch("createUser", this.user);
-      this.openNotification("top-right");
 
-      this.activeCreate = false;
-      this.user = {
-        name: "",
-        email: "",
-        role_id: -1,
-      };
     },
     ...mapMutations(["setActiveEdit"]),
     edit(id) {
@@ -476,7 +497,12 @@ export default {
       }
     },
     exportUsers() {
-      this.$store.dispatch("exportUsers", {options : this.options,search: this.search,sort: this.sort,role_id:this.role_id});
+      this.$store.dispatch("exportUsers", {
+        options: this.options,
+        search: this.search,
+        sort: this.sort,
+        role_id: this.role_id,
+      });
     },
     editSort(key) {
       if (this.sort.key == key) {
@@ -486,7 +512,7 @@ export default {
             type: 0,
           };
         } else {
-          let a = this.sort.type+1;
+          let a = this.sort.type + 1;
           return {
             key: key,
             type: a,
