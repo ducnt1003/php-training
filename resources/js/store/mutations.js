@@ -14,6 +14,11 @@ export default {
     setUsers(state, users) {
         state.users = users;
     },
+    setPaginate(state,data){
+        state.paginate.page = data.page;
+        state.paginate.max = data.max;
+        state.paginate.length = data.length;
+    },
     createUser(state, user) {
         state.users.push(user);
     },
@@ -53,5 +58,9 @@ export default {
     },
     setSuccess(state, success) {
         state.success = success;
-    }
+    },
+    setLoading(state){
+        state.isLoading = !state.isLoading;
+    },
+
 };

@@ -6,10 +6,15 @@
         <template #header>
           <vs-row>
             <vs-col w="6"
-              ><vs-input v-model="search" border :placeholder="$t('search')"
-            /></vs-col>
+              ><vs-input v-model="search" :placeholder="$t('searchname')" />
+            </vs-col>
             <vs-col w="2">
-              <vs-row justify="flex-start"
+              <vs-button color="rgb(59,222,200)" @click="searchUser()">
+                {{ $t('search') }}
+              </vs-button>
+            </vs-col>
+            <vs-col w="2">
+              <vs-row justify="flex-end"
                 ><vs-col w="12"
                   ><vs-select
                     :placeholder="$t('role')"
@@ -29,7 +34,7 @@
               >
             </vs-col>
 
-            <vs-col w="4">
+            <vs-col w="2">
               <vs-row justify="flex-end">
                 <vs-button @click="exportUsers" transparent icon>
                   <box-icon name="export"></box-icon> </vs-button
@@ -84,18 +89,14 @@
         <template #thead>
           <vs-tr>
             <vs-th v-if="check_role == 'SuperAdmin'" style="width: 3%">
-              <vs-checkbox
-                :indeterminate="selected.length == users.length"
-                v-model="allCheck"
-                @change="selected = $vs.checkAll(selected, users)"
-              />
+              <vs-checkbox v-model="allCheck" @change="selected = checkAll()" />
             </vs-th>
             <vs-th
               v-if="options.includes('id')"
               style="width: 7%"
               sort
               @click="
-                usersx = $vs.sortData($event, usersx, 'id');
+                usersx = $vs.sortData($event, usersx, '');
                 sort = editSort('id');
               "
             >
@@ -106,7 +107,7 @@
               style="width: 40%"
               sort
               @click="
-                usersx = $vs.sortData($event, usersx, 'email');
+                usersx = $vs.sortData($event, usersx, '');
                 sort = editSort('email');
               "
             >
@@ -117,7 +118,7 @@
               style="width: 20%"
               sort
               @click="
-                usersx = $vs.sortData($event, usersx, 'name');
+                usersx = $vs.sortData($event, usersx, '');
                 sort = editSort('name');
               "
             >
@@ -128,7 +129,7 @@
               style="width: 10%"
               sort
               @click="
-                usersx = $vs.sortData($event, usersx, 'role_id');
+                usersx = $vs.sortData($event, usersx, '');
                 sort = editSort('role_id');
               "
             >
@@ -154,7 +155,7 @@
         <template #tbody>
           <vs-tr
             :key="i"
-            v-for="(tr, i) in $vs.getPage(usersx, page, max)"
+            v-for="(tr, i) in usersx"
             :data="tr"
             :is-selected="!!selected.includes(tr)"
           >
@@ -187,7 +188,7 @@
           </vs-tr>
         </template>
         <template #footer>
-          <vs-pagination v-model="page" :length="$vs.getLength(usersx, max)" />
+          <vs-pagination v-model="page" :length="paginate.length" />
         </template>
       </vs-table>
     </vs-row>
@@ -380,6 +381,7 @@ export default {
         key: "",
         type: 0,
       },
+      loading: "",
     };
   },
   watch: {
@@ -389,33 +391,34 @@ export default {
     },
     users(newVal) {
       this.usersx = newVal;
+      if (this.allCheck) {
+        this.selected = this.checkAll();
+      }
     },
-    search(newVal) {
-      if (this.role_id != 4 && this.role_id != 0) {
-        this.usersx = this.getSearch(
-          this.filterRole(this.users, this.role_id),
-          newVal
-        );
-      } else {
-        this.usersx = this.getSearch(this.users, newVal);
+    search(newVal,oldVal) {
+      if (newVal == "" && oldVal != newVal) {
+        this.page = 1;
+        this.setUser();
       }
     },
     errors(newVal) {
       this.$refs.form.setErrors(newVal);
       this.openNotification("top-right");
-      console.log(newVal);
     },
     role_id(newVal) {
-      if (this.search != "") {
-        this.usersx = this.filterRole(
-          this.getSearch(this.users, this.search),
-          newVal
-        );
-      } else {
-        this.usersx = this.filterRole(this.users, newVal);
-      }
+      //   if (this.search != "") {
+      //     this.usersx = this.filterRole(
+      //       this.getSearch(this.users, this.search),
+      //       newVal
+      //     );
+      //   } else {
+      //     this.usersx = this.filterRole(this.users, newVal);
+      //   }
+      this.page = 1;
+      this.setUser();
     },
-    success(newVal){
+    success(newVal) {
+      if (newVal == "successcreate") {
         this.openNotification("top-right");
         this.activeCreate = false;
         this.user = {
@@ -423,17 +426,63 @@ export default {
           email: "",
           role_id: -1,
         };
+        this.setUser();
         this.$store.dispatch("setSuccess");
-    }
+      } else if (newVal == "successdelete") {
+        this.setUser();
+        this.$store.dispatch("setSuccess");
+      } else if (newVal == "successdeletemulti") {
+        this.setUser();
+        this.$store.dispatch("setSuccess");
+      }
+    },
+    isLoading(newVal) {
+      if (newVal == true) this.openLoading();
+      else this.closeLoading();
+    },
+    paginate(newVal) {
+      this.page = this.paginate.page;
+    },
+    page(newVal) {
+      this.setUser();
+    },
+    sort(newVal) {
+      this.setUser();
+    },
+    allCheck(newVal) {
+      if (newVal == false) {
+        this.selected = [];
+      }
+    },
   },
   computed: {
-    // users() {
-    //   //console.log(this.users);
-    //   return this.$store.getters.users;
-    // },
-    ...mapGetters(["activeEdit", "users", "errors","success"]),
+    ...mapGetters([
+      "activeEdit",
+      "users",
+      "errors",
+      "success",
+      "isLoading",
+      "paginate",
+    ]),
   },
   methods: {
+    openLoading() {
+      this.loading = this.$vs.loading();
+    },
+    closeLoading() {
+      this.loading.close();
+    },
+    checkAll() {
+      let arr = [];
+      if (this.allCheck) {
+        this.usersx.forEach((user) => {
+          if (user.id != 1) {
+            arr.push(user);
+          }
+        });
+      }
+      return arr;
+    },
     openNotification(position = null) {
       if (this.errors != "") {
         const noti = this.$vs.notification({
@@ -447,9 +496,16 @@ export default {
           title: this.$t("success"),
           text: this.$t("createsuccess"),
         });
-        this.activeCreate = false;
-        this.user = {};
       }
+    },
+    setUser() {
+      this.$store.dispatch("setUsers", {
+        page: this.page,
+        search: this.search,
+        key: this.sort["key"],
+        type: this.sort["type"],
+        role_id: this.role_id,
+      });
     },
     openNotificationSelected(position = null) {
       const noti = this.$vs.notification({
@@ -458,11 +514,14 @@ export default {
         text: this.$t("errorselect"),
       });
     },
+    searchUser() {
+      this.page = 1;
+      this.setUser();
+    },
 
     //...mapActions(['createUser']);
     create() {
       this.$store.dispatch("createUser", this.user);
-
     },
     ...mapMutations(["setActiveEdit"]),
     edit(id) {
@@ -475,7 +534,7 @@ export default {
     deleteUsers() {
       //console.log(this.selected)
       if (this.selected.length > 0) {
-        this.$store.dispatch("deleteUsers", this.selected);
+        this.$store.dispatch("deleteUsers", {selected:this.selected,allCheck:this.allCheck});
         this.selected = [];
         this.activeDeleteMulti = false;
       } else {
@@ -497,6 +556,7 @@ export default {
       }
     },
     exportUsers() {
+      this.$store.dispatch("setLoading");
       this.$store.dispatch("exportUsers", {
         options: this.options,
         search: this.search,
@@ -528,7 +588,14 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("setUsers");
+    // this.$store.dispatch("setUsers", {
+    //   page: this.page,
+    //   search: this.search,
+    //   key: this.sort["key"],
+    //   type: this.sort["type"],
+    //   role_id: this.role_id,
+    // });
+    this.setUser();
     this.check_role = JSON.parse(localStorage.getItem("user")).role;
   },
   mounted() {

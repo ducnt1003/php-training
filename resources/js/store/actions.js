@@ -18,10 +18,20 @@ export default {
     },
     setUsers({
         commit
-    }) {
-        getUser()
+    },options) {
+        commit('setLoading');
+        if(options.page==null) options.page=1;
+        getUser(options)
             .then((res) => {
-                commit('setUsers', res.data);
+                commit('setUsers', res.data.data);
+                commit('setPaginate', {
+                    'page': res.data.current_page,
+                    'max': res.data.perpage,
+                    'length': res.data.last_page
+                })
+                commit('setLoading');
+            }).catch((err)=>{
+                commit('setLoading');
             });
     },
     createUser({
@@ -29,9 +39,9 @@ export default {
     }, user) {
         createUser(user)
             .then((res) => {
-                commit('createUser', res.data);
+                //commit('createUser', res.data);
                 commit('setErrors', '');
-                commit('setSuccess', 'success');
+                commit('setSuccess', 'successcreate');
             }).catch((err) => {
                 if (err.response.status === 403) console.log(err.response);
                 if (err.response.status === 422) {
@@ -59,21 +69,23 @@ export default {
         commit
     }, id) {
         deleteUser(id).then((res) => {
-            console.log(res.data)
+            console.log(res.data),
+            commit('setSuccess', 'successdelete');
         }).catch((err) => {
             console.log(err);
             router.push({
                 name: 'errors500'
             });
         });
-        commit('delete', id);
+        //commit('delete', id);
     },
     deleteUsers({
         commit
     }, selected) {
         deleteUsers(selected).then((res) => {
             console.log(res);
-            commit('delete_multi', selected);
+            commit('setSuccess', 'successdeletemulti');
+            //commit('delete_multi', selected);
         })
 
     },
@@ -81,8 +93,11 @@ export default {
         commit
     }, options) {
         exportUsers(options).then((response) => {
-            console.log(response)
-            var fileURL = window.URL.createObjectURL(new Blob([response.data],{ type: 'application/vnd.ms-excel;charset=utf-8' }));
+            commit('setLoading');
+            console.log(response);
+            var fileURL = window.URL.createObjectURL(new Blob([response.data], {
+                type: 'application/vnd.ms-excel;charset=utf-8'
+            }));
             var fileLink = document.createElement('a');
             fileLink.href = fileURL;
             fileLink.setAttribute('download', 'users.xlsx');
@@ -90,7 +105,17 @@ export default {
             fileLink.click();
         })
     },
-    setSuccess({commit}){
+    setSuccess({
+        commit
+    }) {
         commit('setSuccess', '');
+    },
+    setLoading({
+        commit
+    }) {
+        commit('setLoading');
+    },
+    changePage({commit},page){
+        commit('changePage',page)
     }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -13,9 +14,23 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function getList()
+    public function getList(Request $request)
     {
-        return $this->userRepository->getListWithRole();
+        $whereLike = [];
+        if ($request->search) {
+            array_push($whereLike, [DB::raw('BINARY `name`'), 'like', '%' . $request->search . '%']);
+        }
+        if ($request->role_id && $request->role_id != config('constants.role_id_max') && $request->role_id != config('constants.role_id_min')) {
+            array_push($whereLike, ['role_id', $request->role_id]);
+        }
+        if ($request->type == config('constants.non_short_type') || !$request->type) {
+            $orderBy = ['id', config('constants.short_asc')];
+        } else if ($request->type == config('constants.short_type_asc')) {
+            $orderBy = [$request->key, config('constants.short_asc')];
+        } else {
+            $orderBy = [$request->key, config('constants.short_desc')];
+        }
+        return $this->userRepository->getListWithRole($whereLike,$orderBy);
     }
 
     public function create(Request $request)
@@ -59,10 +74,17 @@ class UserService
 
     public function deleteMulti(Request $request)
     {
-
         $selecteds = $request->input('selected');
-        foreach ($selecteds as $selected) {
-            if (!$this->userRepository->delete($selected['id'])) {
+        if(!$selecteds['allCheck']){
+            foreach ($selecteds['selected'] as $selected) {
+                if (!$this->userRepository->delete($selected['id'])) {
+                    return response()->json([
+                        'response' => 'fail',
+                    ])->setStatusCode(500);
+                }
+            }
+        } else {
+            if (!$this->userRepository->deleteAllUser()) {
                 return response()->json([
                     'response' => 'fail',
                 ])->setStatusCode(500);

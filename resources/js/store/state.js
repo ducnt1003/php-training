@@ -8,6 +8,12 @@ export default {
     user: {},
     activeEdit: false,
     errors:'',
-    success:''
+    success:'',
+    isLoading: false,
+    paginate:{
+        page:1,
+        max:0,
+        length:0,
+    },
 
 };

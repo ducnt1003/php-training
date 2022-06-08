@@ -29,11 +29,13 @@ httpClient.interceptors.response.use(response => {
     return response;
 }, error => {
     if (error.response.status === 401) {
+        store.state.isLoading=false;
         console.log(error.response);
         router.push({name:"login"});
         store.state.errors=error.response.data;
         localStorage.removeItem('usertoken');
         localStorage.removeItem('user');
+        location.reload();
     } else if (error.response.status === 500){
         router.push({name:"error500"});
     }

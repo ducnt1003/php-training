@@ -34,15 +34,15 @@ class UsersExport implements FromQuery, WithHeadings, WithColumnWidths, WithMapp
         if ($this->search) {
             array_push($whereLike, [DB::raw('BINARY `name`'), 'like', '%' . $this->search . '%']);
         }
-        if ($this->role_id && $this->role_id != 4 && $this->role_id != 0) {
+        if ($this->role_id && $this->role_id != config('constants.role_id_max') && $this->role_id != config('constants.role_id_min')) {
             array_push($whereLike, ['role_id', $this->role_id]);
         }
-        if ($this->sort['type'] == 0) {
-            $orderBy = ['id', 'asc'];
+        if ($this->sort['type'] == config('constants.non_short_type')) {
+            $orderBy = ['id', config('constants.short_asc')];
         } else if ($this->sort['type'] == 1) {
-            $orderBy = [$this->sort['key'], 'asc'];
+            $orderBy = [$this->sort['key'], config('constants.short_asc')];
         } else {
-            $orderBy = [$this->sort['key'], 'desc'];
+            $orderBy = [$this->sort['key'], config('constants.short_desc')];
         }
         return User::select('id', 'name', 'email', 'role_id')->where($whereLike)->with(['role'])->orderBy($orderBy[0], $orderBy[1]);
     }
