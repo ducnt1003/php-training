@@ -3,6 +3,8 @@
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +21,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/posts/create',[PostController::class,'create']);
+
+Route::prefix('auth')->middleware('api')->group(function(){
+    Route::post('/login',[AuthController::class, 'login']);
+    Route::post('/logout',[AuthController::class, 'logout']);
+    Route::post('/refresh',[AuthController::class, 'refresh']);
+    Route::post('/me',[AuthController::class, 'me']);
+});
+
+Route::prefix('users')->middleware('auth:api')->group(function(){
+    Route::get('/',[UserController::class,'getList'])->middleware('role:SuperAdmin;Admin');
+    Route::post('/create',[UserController::class,'create'])->middleware('role:SuperAdmin');
+    Route::post('/edit/{id}',[UserController::class,'edit'])->middleware('role:SuperAdmin');
+    Route::delete('delete/{id}',[UserController::class,'delete'])->middleware('role:SuperAdmin');
+    Route::delete('/delete-multi',[UserController::class,'deleteMulti'])->middleware('role:SuperAdmin;Admin');;
+    Route::post('export/', [UserController::class, 'export']);
+});
+
+
+
+Route::get('/',[UserController::class,'getList']);
+
+

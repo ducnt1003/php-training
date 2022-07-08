@@ -8,39 +8,23 @@ require('./bootstrap');
 
 window.Vue = require('vue').default;
 
-import VueRouter from 'vue-router';
-Vue.use(VueRouter);
-
 import VueAxios from 'vue-axios';
 import axios from 'axios';
-
-
 Vue.use(VueAxios, axios);
+
 import Vuesax from 'vuesax'
 import 'vuesax/dist/vuesax.css'
 Vue.use(Vuesax);
 
 import 'material-icons/iconfont/material-icons.css';
+import 'boxicons'
 
 import App from './App.vue';
+import store from './store/store';
+import {router} from './router';
+import i18n from './i18n';
 
-import ExampleComponent from './components/ExampleComponent.vue';
-import LoginComponent from './components/LoginComponent.vue';
 
-
-const routes = [
-  {
-      name: 'example',
-      path: '/',
-      component: ExampleComponent
-  },
-  {
-    name: 'login',
-    path: '/login',
-    component: LoginComponent
-},
-];
-
-const router = new VueRouter({ mode: 'history', routes: routes});
-
-const app = new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+const app = new Vue(Vue.util.extend({
+    router,store,i18n
+}, App)).$mount('#app');
